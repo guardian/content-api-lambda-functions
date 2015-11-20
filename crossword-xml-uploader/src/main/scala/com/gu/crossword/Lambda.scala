@@ -5,11 +5,11 @@ import com.amazonaws.services.lambda.runtime.{ RequestHandler, Context }
 import com.squareup.okhttp._
 
 class Lambda
-    extends RequestHandler[JMap[String, String], Unit]
+    extends RequestHandler[JMap[String, Object], Unit]
     with CrosswordUploader
     with CrosswordStore {
 
-  override def handleRequest(event: JMap[String, String], context: Context): Unit = {
+  override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
 
     implicit val config = new Config(context)
 

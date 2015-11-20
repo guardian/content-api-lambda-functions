@@ -8,12 +8,12 @@ import com.squareup.okhttp._
 import org.apache.http.HttpStatus
 
 class Lambda
-    extends RequestHandler[JMap[String, String], Unit]
+    extends RequestHandler[JMap[String, Object], Unit]
     with CrosswordUploader
     with CrosswordStore
     with PublicPdfStore {
 
-  override def handleRequest(event: JMap[String, String], context: Context): Unit = {
+  override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
     implicit val config = new Config(context)
 
     println("The uploading of crossword pdf files has started.")
