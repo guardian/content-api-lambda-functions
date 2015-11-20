@@ -8,7 +8,7 @@ import scala.concurrent.duration.Duration
  */
 object DevMain extends App {
 
-  val fakeScheduledEvent = new util.HashMap[String, String]()
+  val fakeScheduledEvent = new util.HashMap[String, Object]()
 
   val start = System.nanoTime()
   new Lambda().handleRequest(fakeScheduledEvent, null)

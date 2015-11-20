@@ -11,7 +11,7 @@ object CrosswordUploaderBuild extends Build {
     scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
   )
 
-  val root = Project("crossword", file("."))
+  val root = Project("crossword-xml-uploader", file("."))
     .settings(
 
       libraryDependencies ++= Seq(
