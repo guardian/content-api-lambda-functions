@@ -18,7 +18,7 @@ class Lambda
     for {
       crosswordXmlFile <- getCrosswordXmlFiles
     } yield {
-      val response: Response = uploadCrossword(crosswordXmlFile.file)
+      val response: Response = uploadCrossword(crosswordXmlFile)
       val responseBody = response.body().string()
       if (response.isSuccessful) {
         /* TODO: Create page given flex integration endpoint - faking for now */
