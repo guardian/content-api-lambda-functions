@@ -1,17 +1,17 @@
-package com.gu.crossword
+package com.gu.crossword.crosswords
 
 import java.io.ByteArrayOutputStream
 
-import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
-import com.gu.crossword.models.CrosswordXmlFile
+import com.gu.crossword.crosswords.models.CrosswordXmlFile
+import com.gu.crossword.services.S3.s3Client
+
 import scala.collection.JavaConversions._
 
 trait CrosswordStore {
 
   private val crosswordsBucketName: String = "crosswords-for-processing"
-  private val s3Client: AmazonS3Client = new AmazonS3Client()
 
   def getCrosswordXmlFiles: List[CrosswordXmlFile] = {
     s3Client.listObjects(crosswordsBucketName).getObjectSummaries.toList

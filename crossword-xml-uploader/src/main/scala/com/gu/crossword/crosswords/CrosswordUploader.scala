@@ -1,11 +1,11 @@
-package com.gu.crossword
+package com.gu.crossword.crosswords
 
-import com.gu.crossword.models.CrosswordXmlFile
+import com.gu.crossword.Config
+import com.gu.crossword.crosswords.models.CrosswordXmlFile
+import com.gu.crossword.services.Http.httpClient
 import com.squareup.okhttp._
 
 trait CrosswordUploader {
-
-  private val httpClient: OkHttpClient = new OkHttpClient()
 
   def uploadCrossword(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config): Response = {
     val request = buildRequest(crosswordXmlFile)
