@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource-content>
+    <cms-path>/Guardian/crosswords/quiptic/834</cms-path>
+    <publication>guardian.co.uk publication</publication>
+    <issue-date>09.11.2015 00:00</issue-date>
+    <web-publication-date>09.11.2015 00:00</web-publication-date>
+    <headline>Quiptic crossword No 834</headline>
+    <link-text>Quiptic crossword No 834</link-text>
+    <trail-text>Quiptic crossword No 834</trail-text>
+    <commentable>true</commentable>
+
+    <references>
+        <reference>
+            <type>CROSSWORD</type>
+            <token>Crossword</token>
+        </reference>
+        <reference>
+            <type>CROSSWORD</type>
+            <token>Quiptic</token>
+        </reference>
+
+        <reference>
+            <type>CROSSWORD</type>
+            <token>Moley</token>
+        </reference>
+
+    </references>
+</resource-content>

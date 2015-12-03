@@ -18,6 +18,7 @@ object CrosswordUploaderBuild extends Build {
         "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
         "com.amazonaws" % "aws-java-sdk-s3" % "1.9.30",
         "com.squareup.okhttp" % "okhttp" % "2.5.0",
+        "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
         "com.google.guava" % "guava" % "18.0",
         "org.scalatest" %% "scalatest" % "2.2.5" % "test"
       )
