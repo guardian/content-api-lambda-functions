@@ -22,14 +22,12 @@ trait ComposerCrosswordIntegration extends Kinesis {
       .withStreamName(config.composerCrosswordIntegrationStreamName)
       .withRecords(record)
 
-    kinesisClient.putRecordsAsync(request, new AsyncHandler[PutRecordsRequest, PutRecordsResult] {
-      override def onError(exception: Exception): Unit =
-        println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed with error: $exception")
-
-      override def onSuccess(request: PutRecordsRequest, result: PutRecordsResult): Unit =
-        println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
-    })
-
+    val putRecordsResult : PutRecordsResult = kinesisClient.putRecords(request)
+    if (putRecordsResult.getFailedRecordCount > 0) {
+      println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
+    } else {
+      println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
+    }
   }
 
 }
