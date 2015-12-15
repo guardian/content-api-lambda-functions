@@ -26,7 +26,7 @@ class XmlProcessorTest extends FlatSpec with Matchers with XmlProcessor {
   }
 
   it should "process the issue date correctly." in {
-    (processedXml \\ "crossword").head.attribute("issue-date").get.text should be("20151109")
+    (processedXml \\ "crossword").head.attribute("issue-date").get.text should be("2015-11-09T00:00:00.000+00:00")
   }
 
   it should "process the web publication date correctly." in {

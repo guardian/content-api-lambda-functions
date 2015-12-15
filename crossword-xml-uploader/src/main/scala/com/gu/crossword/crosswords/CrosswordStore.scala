@@ -11,7 +11,7 @@ import scala.collection.JavaConversions._
 
 trait CrosswordStore {
 
-  private val crosswordsBucketName: String = "crosswords-for-processing"
+  private val crosswordsBucketName: String = "crossword-files-for-processing"
 
   def getCrosswordXmlFiles: List[CrosswordXmlFile] = {
     s3Client.listObjects(crosswordsBucketName).getObjectSummaries.toList
