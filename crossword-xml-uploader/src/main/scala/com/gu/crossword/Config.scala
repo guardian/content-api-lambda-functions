@@ -1,6 +1,7 @@
 package com.gu.crossword
 
 import java.util.Properties
+import com.amazonaws.regions.{ Regions, Region }
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.crossword.services.S3.s3Client
 import scala.util.Try
@@ -12,7 +13,7 @@ class Config(val context: Context) {
   private val config = loadConfig()
 
   val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
-  val composerCrosswordIntegrationUrl = Option(config.getProperty("composerCrosswordIntegration.url")) getOrElse sys.error("'composerCrosswordIntegration.url' property missing")
+  val composerCrosswordIntegrationStreamName = Option(config.getProperty("composerCrosswordIntegration.streamName")) getOrElse sys.error("'composerCrosswordIntegration.streamName' property missing")
 
   private def loadConfig() = {
     val configFileKey = s"crossword-xml-uploader/$stage/config.properties"

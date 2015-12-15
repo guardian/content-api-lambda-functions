@@ -4,12 +4,22 @@ import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.Http.httpClient
 import com.squareup.okhttp._
+import scala.xml.XML
 
-trait CrosswordUploader {
+trait CrosswordUploader extends ComposerCrosswordIntegration with XmlProcessor {
 
-  def uploadCrossword(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config): Response = {
+  def uploadCrossword(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config): Unit = {
     val request = buildRequest(crosswordXmlFile)
-    httpClient.newCall(request).execute()
+    val response: Response = httpClient.newCall(request).execute()
+
+    val responseBody = response.body.string
+    if (response.isSuccessful) {
+      val crosswordXmlToCreatePage = process(XML.loadString(responseBody))
+      println(s"creating page for crossword ${crosswordXmlFile.key} in flex.")
+      createPage(crosswordXmlFile, crosswordXmlToCreatePage)
+    } else
+      println(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}")
+
   }
 
   private def buildRequest(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config) = {
