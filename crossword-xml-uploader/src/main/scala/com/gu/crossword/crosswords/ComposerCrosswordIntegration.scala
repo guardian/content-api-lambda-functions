@@ -22,7 +22,7 @@ trait ComposerCrosswordIntegration extends Kinesis {
       .withStreamName(config.composerCrosswordIntegrationStreamName)
       .withRecords(record)
 
-    val putRecordsResult : PutRecordsResult = kinesisClient.putRecords(request)
+    val putRecordsResult: PutRecordsResult = kinesisClient.putRecords(request)
     if (putRecordsResult.getFailedRecordCount > 0) {
       println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
     } else {

@@ -9,7 +9,7 @@ import scala.collection.JavaConversions._
 
 trait CrosswordStore extends S3Provider {
 
-  private val bucketName = "crosswords-for-processing"
+  private val bucketName = "crossword-files-for-processing"
 
   def getCrosswordPdfFiles: List[CrosswordPdfFile] = {
     for {
