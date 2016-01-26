@@ -5,7 +5,7 @@ import scala.util.{ Success, Try }
 
 case class CrosswordPdfFile(awsKey: String, filename: CrosswordPdfFileName, file: Array[Byte])
 
-case class CrosswordPdfFileName(year: String, month: String, day: String, `type`: String) {
+case class CrosswordPdfFileName(year: String, month: String, day: String, `type`: String, fileName: String) {
   def getPublicationDate: DateTime = new LocalDate(year.toInt, month.toInt, day.toInt).toDateTimeAtStartOfDay
 }
 
@@ -27,7 +27,9 @@ object CrosswordPdfFileName {
         case crosswordType => crosswordType
       }
 
-      CrosswordPdfFileName(year, month, day, `type`)
+      val fileName = List(nameParts(0), nameParts(1), nameParts(2), nameParts.last).mkString(".")
+
+      CrosswordPdfFileName(year, month, day, `type`, fileName)
     }
 
     attemptKeyParse match {
