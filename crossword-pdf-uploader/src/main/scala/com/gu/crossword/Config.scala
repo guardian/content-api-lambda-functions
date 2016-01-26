@@ -2,12 +2,15 @@ package com.gu.crossword
 
 import java.util.Properties
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.s3.AmazonS3Client
+import com.gu.crossword.stores.S3Provider
 
 import scala.util.Try
 
-class Config(val context: Context) {
+class Config(val context: Context) extends S3Provider {
 
   private val isProd = Try(context.getFunctionName.toLowerCase.contains("-prod")).getOrElse(false)
   private val stage = if (isProd) "PROD" else "CODE"
@@ -18,7 +21,6 @@ class Config(val context: Context) {
   val crosswordPdfPublicFileLocation = s"https://s3-eu-west-1.amazonaws.com/$crosswordPdfPublicBucketName"
 
   private def loadConfig() = {
-    val s3Client: AmazonS3Client = new AmazonS3Client()
     val configFileKey = s"crossword-pdf-uploader/$stage/config.properties"
     val configInputStream = s3Client.getObject("crossword-uploader-config", configFileKey).getObjectContent
     val configFile: Properties = new Properties()
