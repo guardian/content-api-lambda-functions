@@ -16,7 +16,7 @@ trait CrosswordStore extends S3Provider {
       key <- getCrosswordKeys
       crosswordPdfFileName <- CrosswordPdfFileName(key)
       if !isFutureCrossword(crosswordPdfFileName)
-    } yield CrosswordPdfFile(key, crosswordPdfFileName, getCrossword(key))
+    } yield CrosswordPdfFile(crosswordPdfFileName.fileName, crosswordPdfFileName, getCrossword(key))
   }
 
   def getCrossword(key: String): Array[Byte] = {

@@ -11,6 +11,7 @@ class CrosswordPdfFileNameSpec extends FlatSpec with Matchers {
     crosswordPdfFileName.month should be("11")
     crosswordPdfFileName.year should be("2015")
     crosswordPdfFileName.`type` should be("weekend")
+    crosswordPdfFileName.fileName should be("gdn.weekend.20151128.pdf")
   }
 
   it should "set the type to 'prize' if key contains type 'cryptic and day is Saturday" in {
