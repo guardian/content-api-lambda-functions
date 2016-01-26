@@ -31,7 +31,7 @@ trait CrosswordStore extends S3Provider {
     /* Sort crosswords by name */
     val groupedSummaries = s3ObjectSummaries.groupBy(os => {
       val nameParts = os.getKey.split("\\.").toList
-      List(nameParts(0), nameParts(1), nameParts(2), nameParts.last).mkString(".")
+      List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
     })
 
     /* Remove oldest version of each crossword if multiple versions */
