@@ -1,7 +1,5 @@
 package com.gu.crossword.stores
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.s3.AmazonS3Client
 
 trait S3Provider {

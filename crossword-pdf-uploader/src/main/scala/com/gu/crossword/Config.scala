@@ -2,10 +2,7 @@ package com.gu.crossword
 
 import java.util.Properties
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.s3.AmazonS3Client
 import com.gu.crossword.stores.S3Provider
 
 import scala.util.Try
