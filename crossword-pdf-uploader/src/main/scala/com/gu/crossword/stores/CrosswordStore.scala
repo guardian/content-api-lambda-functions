@@ -25,8 +25,23 @@ trait CrosswordStore extends S3Provider {
   }
 
   private def getCrosswordKeys: List[String] = {
-    s3Client.listObjects(bucketName).getObjectSummaries.toList
-      .collect { case os if os.getKey.endsWith(".pdf") => os.getKey }
+    val s3ObjectSummaries = s3Client.listObjects(bucketName).getObjectSummaries.toList
+      .collect { case os if os.getKey.endsWith(".pdf") => os }
+
+    /* Sort crosswords by name */
+    val groupedSummaries = s3ObjectSummaries.groupBy(os => {
+      val nameParts = os.getKey.split("\\.").toList
+      List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
+    })
+
+    /* Remove oldest version of each crossword if multiple versions */
+    val newestSummaries = groupedSummaries map {
+      case (fileName, listOfS3Objects) => {
+        listOfS3Objects.sortWith(_.getLastModified.getTime > _.getLastModified.getTime).head.getKey
+      }
+    }
+
+    newestSummaries.toList
   }
 
   /* Future crosswords should be skipped */
