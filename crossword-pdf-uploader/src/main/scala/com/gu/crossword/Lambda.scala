@@ -29,7 +29,9 @@ class Lambda
   }
 
   private def handleResponse(response: Response, crosswordPdfFile: CrosswordPdfFile) = {
+    println(s"Microapp response: '${response.message}' with status code: ${response.code}")
     if (response.isSuccessful) {
+      archiveProcessedPdfFiles(crosswordPdfFile.awsKey)
       println(s"Successfully uploaded crossword ${crosswordPdfFile.awsKey}")
     } else if (response.code() == HttpStatus.SC_NOT_FOUND) {
       println(s"Looks like the crossword microapp could not find the relevant crossword for ${crosswordPdfFile.awsKey}. " +

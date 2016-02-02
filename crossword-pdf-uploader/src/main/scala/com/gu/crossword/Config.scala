@@ -17,7 +17,6 @@ class Config(val context: Context) extends S3Provider {
   val crosswordPdfPublicBucketName = s"crosswords-pdf-public-${stage.toLowerCase}"
   val crosswordPdfPublicFileLocation = if (isProd) s"https://crosswords-static.guim.co.uk" else s"https://s3-eu-west-1.amazonaws.com/$crosswordPdfPublicBucketName"
 
-
   private def loadConfig() = {
     val configFileKey = s"crossword-pdf-uploader/$stage/config.properties"
     val configInputStream = s3Client.getObject("crossword-uploader-config", configFileKey).getObjectContent

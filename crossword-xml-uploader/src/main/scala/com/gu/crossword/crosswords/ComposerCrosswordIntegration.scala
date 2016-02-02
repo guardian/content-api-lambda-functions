@@ -10,7 +10,7 @@ import com.amazonaws.services.kinesis.model.{ PutRecordsRequestEntry, PutRecords
 
 import scala.xml._
 
-trait ComposerCrosswordIntegration extends Kinesis {
+trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
 
   def createPage(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem)(implicit config: Config): Unit = {
 
@@ -27,6 +27,7 @@ trait ComposerCrosswordIntegration extends Kinesis {
       println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
     } else {
       println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
+      archiveCrosswordXMLFile(crosswordXmlFile.key)
     }
   }
 
