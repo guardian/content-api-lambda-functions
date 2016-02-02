@@ -30,4 +30,11 @@ trait CrosswordStore {
     out.toByteArray
   }
 
+  def archiveCrosswordXMLFile(awsKey: String): Unit = {
+    val archiveBucketName = "crossword-processed-files"
+    println(s"Moving $awsKey to bucket $archiveBucketName")
+    s3Client.copyObject(crosswordsBucketName, awsKey, archiveBucketName, awsKey)
+    s3Client.deleteObject(crosswordsBucketName, awsKey)
+  }
+
 }

@@ -2,7 +2,7 @@ package com.gu.crossword.stores
 
 import java.io.ByteArrayOutputStream
 
-import com.amazonaws.services.s3.model.S3Object
+import com.amazonaws.services.s3.model.{ S3ObjectSummary, S3Object }
 import com.google.common.io.ByteStreams
 import com.gu.crossword.models.{ CrosswordPdfFile, CrosswordPdfFileName }
 import scala.collection.JavaConversions._
@@ -24,12 +24,15 @@ trait CrosswordStore extends S3Provider {
     download(obj)
   }
 
-  private def getCrosswordKeys: List[String] = {
-    val s3ObjectSummaries = s3Client.listObjects(bucketName).getObjectSummaries.toList
+  private def getCrosswordPdfObjectSummaries: List[S3ObjectSummary] = {
+    s3Client.listObjects(bucketName).getObjectSummaries.toList
       .collect { case os if os.getKey.endsWith(".pdf") => os }
+  }
+
+  private def getCrosswordKeys: List[String] = {
 
     /* Sort crosswords by name */
-    val groupedSummaries = s3ObjectSummaries.groupBy(os => {
+    val groupedSummaries = getCrosswordPdfObjectSummaries.groupBy(os => {
       val nameParts = os.getKey.split("\\.").toList
       List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
     })
@@ -51,6 +54,20 @@ trait CrosswordStore extends S3Provider {
     val out = new ByteArrayOutputStream(obj.getObjectMetadata.getContentLength.toInt)
     ByteStreams.copy(obj.getObjectContent, out)
     out.toByteArray
+  }
+
+  private def archiveCrosswordPdfFile(awsKey: String) = {
+    val archiveBucketName = "crossword-processed-files"
+    println(s"Moving $awsKey to bucket $archiveBucketName")
+    s3Client.copyObject(bucketName, awsKey, archiveBucketName, awsKey)
+    s3Client.deleteObject(bucketName, awsKey)
+  }
+
+  def archiveProcessedPdfFiles(uploadedCrosswordPdfKey: String): Unit = {
+    println(s"Archiving all versions of $uploadedCrosswordPdfKey")
+    val uploadedCrosswordPdfKeyPrefix = uploadedCrosswordPdfKey.dropRight(4) // remove .pdf file extension
+    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(uploadedCrosswordPdfKeyPrefix)).map(_.getKey)
+    keysToArchive.foreach(archiveCrosswordPdfFile)
   }
 
 }
