@@ -28,10 +28,10 @@ class Lambda
     println("The uploading of crossword pdf files has finished.")
   }
 
-  private def handleResponse(response: Response, crosswordPdfFile: CrosswordPdfFile) = {
+  private def handleResponse(response: Response, crosswordPdfFile: CrosswordPdfFile)(implicit config: Config) = {
     println(s"Microapp response: '${response.message}' with status code: ${response.code}")
     if (response.isSuccessful) {
-      archiveProcessedPdfFiles(crosswordPdfFile.awsKey)
+      if (config.isProd) archiveProcessedPdfFiles(crosswordPdfFile.awsKey)
       println(s"Successfully uploaded crossword ${crosswordPdfFile.awsKey}")
     } else if (response.code() == HttpStatus.SC_NOT_FOUND) {
       println(s"Looks like the crossword microapp could not find the relevant crossword for ${crosswordPdfFile.awsKey}. " +

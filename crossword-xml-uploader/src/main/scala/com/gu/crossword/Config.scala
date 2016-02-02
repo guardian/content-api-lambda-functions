@@ -8,7 +8,7 @@ import scala.util.Try
 
 class Config(val context: Context) {
 
-  private val isProd = Try(context.getFunctionName.toLowerCase.contains("-prod")).getOrElse(false)
+  val isProd = Try(context.getFunctionName.toLowerCase.contains("-prod")).getOrElse(false)
   private val stage = if (isProd) "PROD" else "CODE"
   private val config = loadConfig()
 
