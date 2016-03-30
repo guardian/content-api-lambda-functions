@@ -2,10 +2,21 @@ package com.gu.crossword.crosswords
 
 import java.util.Locale
 import scala.xml._
-import org.joda.time.format.{ DateTimeFormat }
+import org.joda.time.format.{ DateTimeFormat, ISODateTimeFormat }
 import org.joda.time.{ DateTimeZone, LocalDateTime }
 
-trait XmlProcessor {
+trait DateLogic {
+
+  def transformDate(dateString: String): String = {
+    val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm")
+    val outputFormat = ISODateTimeFormat.dateTime()
+    val isoFormattedOutput = LocalDateTime.parse(dateString, inputFormat).toDateTime(DateTimeZone.forID("Europe/London")).toString(outputFormat)
+    isoFormattedOutput.replaceAllLiterally("Z", "+00:00")
+  }
+
+}
+
+trait XmlProcessor extends DateLogic {
 
   def process(crosswordXml: Elem): Elem = {
 
@@ -42,10 +53,8 @@ trait XmlProcessor {
   }
 
   private def getDate(elementName: String)(implicit crosswordXml: Elem): String = {
-    val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm")
-    val outputFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T00:00:00.000+00:00").withLocale(Locale.UK).withZone(DateTimeZone.forID("Europe/London"))
     val dateString = (crosswordXml \\ elementName).text
-    LocalDateTime.parse(dateString, inputFormat).toString(outputFormat)
+    transformDate(dateString)
   }
 
   private def getExternalReferences(implicit crosswordXml: Elem): Seq[(String, String)] = {
