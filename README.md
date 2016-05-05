@@ -6,6 +6,8 @@ Crosswords are uploaded on a regular basis to the S3 bucket by fingerpost. This 
 
 The lambdas are set up in the composer AWS account. Both the CODE and PROD versions read from the same bucket, but write PDF files to different buckets, and talk to the CODE/PROD versions of the microapp respectively. When debugging problems with the crosswords, a good place to start is the cloudwatch logs for the lambdas.
 
+There is an unfinished, but possibly still useful diagram of the crossword publication system [here](https://docs.google.com/drawings/d/1q0FDZIbTDRtRMcMnciEywwgg3VnDYBDxxOATRBfWPsM/).
+
 ## crossword-xml-uploader
 This lambda fetches crossword xml files from s3 and puts them on a kinesis stream for composer to consume.
 
