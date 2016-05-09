@@ -20,7 +20,7 @@ General process:
 
 
 Common problems:
- - XML file invalid e.g. full stop used instead of a comma. Check the microapp logs in the google developers console to see if this has happened
+ - XML file invalid e.g. full stop used instead of a comma. Run the lambda by clicking 'test' in the aws console, then if it throws an error check the microapp logs in the google developers console to get a better idea of what's happened. You should get some indication of what was wrong with the XML file, then you can download it from the source s3 bucket, fix it, then re-upload it and run the lambda again.
  - XML file not added to the source bucket
 
 ## crossword-pdf-uploader
