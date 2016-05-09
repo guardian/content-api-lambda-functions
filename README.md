@@ -21,7 +21,7 @@ General process:
 
 Common problems:
  - XML file invalid e.g. full stop used instead of a comma. Run the lambda by clicking 'test' in the aws console, then if it throws an error check the microapp logs in the google developers console to get a better idea of what's happened. You should get some indication of what was wrong with the XML file, then you can download it from the source s3 bucket, fix it, then re-upload it and run the lambda again.
- - XML file not added to the source bucket
+ - XML file not added to the source bucket - you can check the files-for-processing and processed-files buckets for the file (called <crosswordnumber>.xml) - if it's not there then we need to get fingerpost/ESD to re-upload it then run the lambda again.
 
 ## crossword-pdf-uploader
 This lambda fetches crossword pdf files from a private s3 bucket
