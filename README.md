@@ -4,7 +4,7 @@ by the Editorial Tools team.
 
 Crosswords are uploaded on a regular basis to the S3 bucket by fingerpost. This process is managed by ESD.
 
-The lambdas are set up in the composer AWS account. Both the CODE and PROD versions read from the same bucket, but write PDF files to different buckets, and talk to the CODE/PROD versions of the microapp respectively. When debugging problems with the crosswords, a good place to start is the cloudwatch logs for the lambdas.
+The lambdas are set up in the composer AWS account. Both the CODE and PROD versions read from the same bucket, but write PDF files to different buckets, and talk to the CODE/PROD versions of the microapp respectively. When debugging problems with the crosswords, a useful tool is the [crossword status checker](http://crossword-status-checker-prod.s3-website-eu-west-1.amazonaws.com/) (see [repo on github](https://github.com/guardian/crossword-status-checker)).
 
 There is an unfinished, but possibly still useful diagram of the crossword publication system [here](https://docs.google.com/drawings/d/1q0FDZIbTDRtRMcMnciEywwgg3VnDYBDxxOATRBfWPsM/).
 
