@@ -9,9 +9,8 @@ trait DateLogic {
 
   def transformDate(dateString: String): String = {
     val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm").withZone(DateTimeZone.forID("Europe/London"))
-    val outputFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"))
-    val isoFormattedOutput = DateTime.parse(dateString, inputFormat).toString(outputFormat)
-    isoFormattedOutput.replaceAllLiterally("Z", "+00:00")
+    val outputFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withZone(DateTimeZone.forID("UTC"))
+    DateTime.parse(dateString, inputFormat).toString(outputFormat)
   }
 
 }
