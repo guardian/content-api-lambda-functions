@@ -3,15 +3,14 @@ package com.gu.crossword.crosswords
 import java.util.Locale
 import scala.xml._
 import org.joda.time.format.{ DateTimeFormat, ISODateTimeFormat }
-import org.joda.time.{ DateTimeZone, LocalDateTime }
+import org.joda.time.{ DateTimeZone, LocalDateTime, DateTime }
 
 trait DateLogic {
 
   def transformDate(dateString: String): String = {
-    val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm")
-    val outputFormat = ISODateTimeFormat.dateTime()
-    val isoFormattedOutput = LocalDateTime.parse(dateString, inputFormat).toDateTime(DateTimeZone.forID("Europe/London")).toString(outputFormat)
-    isoFormattedOutput.replaceAllLiterally("Z", "+00:00")
+    val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm").withZone(DateTimeZone.forID("Europe/London"))
+    val outputFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withZone(DateTimeZone.forID("UTC"))
+    DateTime.parse(dateString, inputFormat).toString(outputFormat)
   }
 
 }

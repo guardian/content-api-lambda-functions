@@ -12,7 +12,7 @@ class DateLogicTest extends FlatSpec with Matchers with DateLogic {
   }
 
   it should "transform a date during British summer time" in {
-    transformDate("30.03.2016 00:00") should be("2016-03-30T00:00:00.000+01:00")
+    transformDate("30.03.2016 00:00") should be("2016-03-29T23:00:00.000+00:00")
   }
 
 }
