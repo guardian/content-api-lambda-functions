@@ -16,4 +16,5 @@ jar_file=$(echo $my_dir/target/scala-2.11/crossword-xml-uploader-assembly*.jar)
 
 aws lambda update-function-code \
   --function-name crossword-xml-uploader-$STAGE \
+  --profile composer \
   --zip-file fileb://$jar_file
