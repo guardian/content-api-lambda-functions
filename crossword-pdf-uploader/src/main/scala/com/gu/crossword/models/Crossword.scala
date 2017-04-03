@@ -1,12 +1,12 @@
 package com.gu.crossword.models
 
-import org.joda.time.{ DateTimeConstants, DateTime, LocalDate }
-import scala.util.{ Success, Try }
+import org.joda.time.{DateTime, DateTimeConstants, DateTimeZone, LocalDate}
+import scala.util.{Success, Try}
 
 case class CrosswordPdfFile(awsKey: String, filename: CrosswordPdfFileName, file: Array[Byte])
 
 case class CrosswordPdfFileName(year: String, month: String, day: String, `type`: String, fileName: String) {
-  def getPublicationDate: DateTime = new LocalDate(year.toInt, month.toInt, day.toInt).toDateTimeAtStartOfDay
+  def getPublicationDate: DateTime = new LocalDate(year.toInt, month.toInt, day.toInt).toDateTimeAtStartOfDay(DateTimeZone.forID("Europe/London"))
 }
 
 object CrosswordPdfFileName {
