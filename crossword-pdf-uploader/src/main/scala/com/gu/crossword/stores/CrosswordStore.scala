@@ -34,7 +34,9 @@ trait CrosswordStore extends S3Provider {
     /* Sort crosswords by name */
     val groupedSummaries = getCrosswordPdfObjectSummaries.groupBy(os => {
       val nameParts = os.getKey.split("\\.").toList
-      List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
+      if (nameParts.length >= 3) {
+        List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
+      } else os.getKey
     })
 
     /* Remove oldest version of each crossword if multiple versions */
