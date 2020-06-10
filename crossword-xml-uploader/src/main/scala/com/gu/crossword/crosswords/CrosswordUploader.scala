@@ -19,7 +19,7 @@ trait CrosswordUploader extends ComposerCrosswordIntegration with XmlProcessor {
       createPage(crosswordXmlFile, crosswordXmlToCreatePage)
     } else
       println(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}")
-
+      println(s"Returned error is $responseBody")
   }
 
   private def buildRequest(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config) = {
