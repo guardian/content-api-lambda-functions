@@ -16,7 +16,7 @@ class Lambda
     println("The uploading of crossword xml files has started.")
 
     for {
-      crosswordXmlFile <- getCrosswordXmlFiles
+      crosswordXmlFile <- getCrosswordXmlFiles(config)
     } yield {
       uploadCrossword(crosswordXmlFile)
     }

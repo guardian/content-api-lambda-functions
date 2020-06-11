@@ -1,7 +1,7 @@
 package com.gu.crossword.models
 
-import org.joda.time.{DateTime, DateTimeConstants, DateTimeZone, LocalDate}
-import scala.util.{Success, Try}
+import org.joda.time.{ DateTime, DateTimeConstants, DateTimeZone, LocalDate }
+import scala.util.{ Success, Try }
 
 case class CrosswordPdfFile(awsKey: String, filename: CrosswordPdfFileName, file: Array[Byte])
 
