@@ -15,6 +15,12 @@ class Config(val context: Context) {
   val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
   val composerCrosswordIntegrationStreamName = Option(config.getProperty("composerCrosswordIntegration.streamName")) getOrElse sys.error("'composerCrosswordIntegration.streamName' property missing")
 
+  val crosswordsBucketName: String =
+    if (isProd)
+      "crossword-files-for-processing"
+    else
+      "crossword-files-for-processing-code"
+
   private def loadConfig() = {
     val configFileKey = s"crossword-xml-uploader/$stage/config.properties"
     val configInputStream = s3Client.getObject("crossword-uploader-config", configFileKey).getObjectContent

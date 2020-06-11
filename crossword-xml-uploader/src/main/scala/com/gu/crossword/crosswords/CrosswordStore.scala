@@ -1,6 +1,7 @@
 package com.gu.crossword.crosswords
 
 import java.io.ByteArrayOutputStream
+import com.gu.crossword.Config
 
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
@@ -11,16 +12,17 @@ import scala.collection.JavaConversions._
 
 trait CrosswordStore {
 
-  private val crosswordsBucketName: String = "crossword-files-for-processing"
-
-  def getCrosswordXmlFiles: List[CrosswordXmlFile] = {
-    s3Client.listObjects(crosswordsBucketName).getObjectSummaries.toList
+  def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile] = {
+    s3Client
+      .listObjects(config.crosswordsBucketName)
+      .getObjectSummaries
+      .toList
       .filter(_.getKey.endsWith(".xml"))
-      .map(os => CrosswordXmlFile(os.getKey, getCrossword(os.getKey)))
+      .map(os => CrosswordXmlFile(os.getKey, getCrossword(os.getKey, config)))
   }
 
-  private def getCrossword(key: String): Array[Byte] = {
-    val obj: S3Object = s3Client.getObject(crosswordsBucketName, key)
+  private def getCrossword(key: String, config: Config): Array[Byte] = {
+    val obj: S3Object = s3Client.getObject(config.crosswordsBucketName, key)
     download(obj)
   }
 
@@ -30,11 +32,11 @@ trait CrosswordStore {
     out.toByteArray
   }
 
-  def archiveCrosswordXMLFile(awsKey: String): Unit = {
+  def archiveCrosswordXMLFile(config: Config, awsKey: String): Unit = {
     val archiveBucketName = "crossword-processed-files"
     println(s"Moving $awsKey to bucket $archiveBucketName")
-    s3Client.copyObject(crosswordsBucketName, awsKey, archiveBucketName, awsKey)
-    s3Client.deleteObject(crosswordsBucketName, awsKey)
+    s3Client.copyObject(config.crosswordsBucketName, awsKey, archiveBucketName, awsKey)
+    s3Client.deleteObject(config.crosswordsBucketName, awsKey)
   }
 
 }

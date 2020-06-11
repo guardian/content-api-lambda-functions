@@ -2,7 +2,6 @@ package com.gu.crossword.crosswords
 
 import java.nio.ByteBuffer
 
-import com.amazonaws.handlers.AsyncHandler
 import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.Kinesis
@@ -27,7 +26,7 @@ trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
       println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
     } else {
       println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
-      if (config.isProd) archiveCrosswordXMLFile(crosswordXmlFile.key)
+      if (config.isProd) archiveCrosswordXMLFile(config, crosswordXmlFile.key)
     }
   }
 
