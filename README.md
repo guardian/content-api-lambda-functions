@@ -16,7 +16,7 @@ General process:
  - XML file uploaded to S3
  - Lambda runs every hour, fetches all XML files. For each XML file, it
    - Uploads the file to the [crossword microapp](https://github.com/guardian/crossword). If an error is thrown by the microapp (which will happen if the XML is invalid for some reason), stop here. Otherwise...
-   - Send the crossword on the flex kinesis stream, where flex integration picks it up and turns it into a composer article with a scheduled launch time. The code for this is [here](https://github.com/guardian/flexible-content/blob/master/flexible-content-integration/src/main/scala/com/gu/flexiblecontent/integration/integration/CrosswordImportCommand.scala).
+   - Send the crossword on the flex kinesis stream, where flex integration picks it up and turns it into a composer article with a scheduled launch time. The code for this is [here](https://github.com/guardian/flexible-content/blob/main/flexible-content-integration/src/main/scala/com/gu/flexiblecontent/integration/integration/CrosswordImportCommand.scala).
 
 
 Common problems:
