@@ -15,6 +15,7 @@ jobs:
         with:
           distribution: corretto
           java-version: 8
+          cache: sbt
 
       - name: build and test
         run: sbt clean crossword-xml-uploader/assembly crossword-pdf-uploader/assembly
