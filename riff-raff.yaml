@@ -1,0 +1,18 @@
+stacks:
+  - crosswords
+regions:
+  - eu-west-1
+
+deployments:
+  crossword-pdf-uploader:
+    type: aws-lambda
+    parameters:
+      functionNames: [crossword-pdf-uploader-]
+      fileName: crossword-pdf-uploader.jar
+      prefixStack: false
+  crossword-xml-uploader:
+    type: aws-lambda
+    parameters:
+      functionNames: [crossword-xml-uploader-]
+      fileName: crossword-xml-uploader.jar
+      prefixStack: false

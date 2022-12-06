@@ -14,6 +14,7 @@ lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
   .settings(commonSettings)
   .settings(
     description := "AWS Lambda to upload crossword xml files.",
+    assemblyJarName := "crossword-xml-uploader.jar",
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-s3" % "1.10.39", // FIXME upgrade and merge with pdf-uploader's dependency declaration
       "com.amazonaws" % "aws-java-sdk-kinesis" % "1.10.39",
@@ -25,6 +26,7 @@ lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
   .settings(commonSettings)
   .settings(
     description := "AWS Lambda to upload crossword pdf files.",
+    assemblyJarName := "crossword-pdf-uploader.jar",
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-s3" % "1.9.30"
     )
