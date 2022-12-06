@@ -2,6 +2,9 @@ stacks:
   - crosswords
 regions:
   - eu-west-1
+allowed-stages:
+  - CODE
+  - PROD
 
 deployments:
   crossword-pdf-uploader:
