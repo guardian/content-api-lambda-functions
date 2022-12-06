@@ -2,7 +2,7 @@ stacks:
   - flexible
 regions:
   - eu-west-1
-allowed-stages:
+allowedStages:
   - CODE
   - PROD
 
