@@ -1,5 +1,5 @@
 stacks:
-  - crosswords
+  - flexible
 regions:
   - eu-west-1
 allowed-stages:
