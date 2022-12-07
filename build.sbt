@@ -1,7 +1,7 @@
 lazy val awsSdk = "1.12.359"
 lazy val commonSettings = Seq(
   organization := "com.gu",
-  scalaVersion := "2.12.17",
+  scalaVersion := "2.13.10",
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
@@ -19,7 +19,7 @@ lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-s3" % awsSdk, // FIXME upgrade and merge with pdf-uploader's dependency declaration
       "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdk,
-      "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
+      "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
     ),
     assembly / test := (Test / test).value,
   )

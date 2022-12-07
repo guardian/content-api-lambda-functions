@@ -1,7 +1,7 @@
 package com.gu.crossword.crosswords
 
 import java.io.ByteArrayOutputStream
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
