@@ -1,11 +1,11 @@
 package com.gu.crossword.stores
 
 import java.io.ByteArrayOutputStream
+import scala.collection.JavaConverters._
 
 import com.amazonaws.services.s3.model.{ S3ObjectSummary, S3Object }
 import com.google.common.io.ByteStreams
 import com.gu.crossword.models.{ CrosswordPdfFile, CrosswordPdfFileName }
-import scala.collection.JavaConversions._
 
 trait CrosswordStore extends S3Provider {
 
@@ -25,7 +25,7 @@ trait CrosswordStore extends S3Provider {
   }
 
   private def getCrosswordPdfObjectSummaries: List[S3ObjectSummary] = {
-    s3Client.listObjects(bucketName).getObjectSummaries.toList
+    s3Client.listObjects(bucketName).getObjectSummaries.asScala.toList
       .collect { case os if os.getKey.endsWith(".pdf") => os }
   }
 

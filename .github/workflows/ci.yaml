@@ -31,6 +31,6 @@ jobs:
           configPath: riff-raff.yaml
           contentDirectories: |
             crossword-pdf-uploader:
-              - crossword-pdf-uploader/target/scala-2.11/crossword-pdf-uploader.jar
+              - crossword-pdf-uploader/target/scala-2.12/crossword-pdf-uploader.jar
             crossword-xml-uploader:
-              - crossword-xml-uploader/target/scala-2.11/crossword-xml-uploader.jar
+              - crossword-xml-uploader/target/scala-2.12/crossword-xml-uploader.jar

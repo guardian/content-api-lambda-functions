@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "com.gu",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.12.17",
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
