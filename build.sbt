@@ -9,7 +9,12 @@ lazy val commonSettings = Seq(
     "com.squareup.okhttp3" % "okhttp" % "4.10.0",
     "com.google.guava" % "guava" % "31.1-jre",
     "org.scalatest" %% "scalatest" % "3.2.14" % "test"
-  )
+  ),
+  assembly / test := (Test / test).value,
+  assembly / assemblyMergeStrategy := {
+    case PathList(ps @ _*) if ps.last == "module-info.class" => MergeStrategy.discard
+    case path => MergeStrategy.defaultMergeStrategy(path)
+  }
 )
 
 lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
@@ -21,7 +26,6 @@ lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
       "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdk,
       "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
     ),
-    assembly / test := (Test / test).value,
   )
 
 lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
@@ -30,7 +34,6 @@ lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
     description := "AWS Lambda to upload crossword pdf files.",
     assemblyJarName := "crossword-pdf-uploader.jar",
     libraryDependencies ++= Seq(),
-    assembly / test := (Test / test).value,
   )
 
 
