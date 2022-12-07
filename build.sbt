@@ -2,7 +2,7 @@ lazy val awsSdk = "1.12.359"
 lazy val commonSettings = Seq(
   organization := "com.gu",
   scalaVersion := "2.13.10",
-  scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
+  scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xfatal-warnings"),
   libraryDependencies ++= Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
     "com.amazonaws" % "aws-java-sdk-s3" % awsSdk,

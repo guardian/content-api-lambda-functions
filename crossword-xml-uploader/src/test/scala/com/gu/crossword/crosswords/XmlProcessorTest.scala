@@ -10,9 +10,7 @@ class XmlProcessorTest extends AnyFlatSpec with Matchers with XmlProcessor {
 
   behavior of "XmlProcessorTest - should correctly transform crossword microapp xml to flex integration xml."
 
-  val crosswordMicroAppResponseStream = getClass.getResourceAsStream("/example-crossword-microapp-response-quiptic-834.xml")
-  // FIXME in scala 2.13, replace with Source.fromResource
-  val crosswordMicroAppResponse = Source.fromInputStream(crosswordMicroAppResponseStream).getLines.mkString
+  val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
   val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
   val processedXml = process(crosswordMicroAppResponseXml)
 
