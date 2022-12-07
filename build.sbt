@@ -5,7 +5,7 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
-    "com.squareup.okhttp" % "okhttp" % "2.5.0",
+    "com.squareup.okhttp3" % "okhttp" % "4.10.0",
     "com.google.guava" % "guava" % "18.0",
     "org.scalatest" %% "scalatest" % "3.2.14" % "test"
   )
