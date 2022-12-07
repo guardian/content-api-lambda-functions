@@ -5,6 +5,7 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
+    "com.amazonaws" % "aws-java-sdk-s3" % awsSdk,
     "com.squareup.okhttp3" % "okhttp" % "4.10.0",
     "com.google.guava" % "guava" % "31.1-jre",
     "org.scalatest" %% "scalatest" % "3.2.14" % "test"
@@ -17,7 +18,6 @@ lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
     description := "AWS Lambda to upload crossword xml files.",
     assemblyJarName := "crossword-xml-uploader.jar",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-s3" % awsSdk, // FIXME upgrade and merge with pdf-uploader's dependency declaration
       "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdk,
       "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
     ),
@@ -29,9 +29,7 @@ lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
   .settings(
     description := "AWS Lambda to upload crossword pdf files.",
     assemblyJarName := "crossword-pdf-uploader.jar",
-    libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-s3" % awsSdk
-    ),
+    libraryDependencies ++= Seq(),
     assembly / test := (Test / test).value,
   )
 
