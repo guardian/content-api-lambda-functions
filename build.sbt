@@ -19,7 +19,8 @@ lazy val `crossword-xml-uploader` = (project in file("crossword-xml-uploader"))
       "com.amazonaws" % "aws-java-sdk-s3" % "1.10.39", // FIXME upgrade and merge with pdf-uploader's dependency declaration
       "com.amazonaws" % "aws-java-sdk-kinesis" % "1.10.39",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
-    )
+    ),
+    assembly / test := (Test / test).value,
   )
 
 lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
@@ -29,7 +30,8 @@ lazy val `crossword-pdf-uploader` = (project in file("crossword-pdf-uploader"))
     assemblyJarName := "crossword-pdf-uploader.jar",
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-s3" % "1.9.30"
-    )
+    ),
+    assembly / test := (Test / test).value,
   )
 
 
