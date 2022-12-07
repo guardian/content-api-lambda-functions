@@ -1,8 +1,9 @@
 package com.gu.crossword.models
 
-import org.scalatest.{ Matchers, FlatSpec }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class CrosswordPdfFileNameSpec extends FlatSpec with Matchers {
+class CrosswordPdfFileNameSpec extends AnyFlatSpec with Matchers {
 
   it should "correctly pass a key to create a CrosswordPdfFilename object" in {
     val key = "gdn.weekend.20151128.150316.9726.pdf"
