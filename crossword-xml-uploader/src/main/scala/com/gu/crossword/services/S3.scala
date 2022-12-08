@@ -1,6 +1,5 @@
 package com.gu.crossword.services
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.AmazonS3
 

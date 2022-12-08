@@ -1,8 +1,6 @@
 package com.gu.crossword.services
 
-import com.amazonaws.regions.{ Region, Regions }
-import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient
-import com.gu.crossword.Config
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.kinesis.AmazonKinesisAsync
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder
 

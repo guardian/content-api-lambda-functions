@@ -1,9 +1,8 @@
 package com.gu.crossword.crosswords
 
-import java.util.Locale
 import scala.xml._
-import org.joda.time.format.{ DateTimeFormat, ISODateTimeFormat }
-import org.joda.time.{ DateTimeZone, LocalDateTime, DateTime }
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.{ DateTimeZone, DateTime }
 
 trait DateLogic {
 

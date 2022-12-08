@@ -1,7 +1,6 @@
 package com.gu.crossword
 
 import java.util.Properties
-import com.amazonaws.regions.{ Regions, Region }
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.crossword.services.S3.s3Client
 import scala.util.Try

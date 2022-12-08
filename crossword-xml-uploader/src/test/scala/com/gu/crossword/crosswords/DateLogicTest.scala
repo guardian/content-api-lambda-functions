@@ -1,8 +1,5 @@
 package com.gu.crossword.crosswords
 
-
-import scala.io.Source
-import scala.xml.XML
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

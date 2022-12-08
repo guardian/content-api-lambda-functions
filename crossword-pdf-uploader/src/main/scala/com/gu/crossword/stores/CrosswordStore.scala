@@ -41,7 +41,7 @@ trait CrosswordStore extends S3Provider {
 
     /* Remove oldest version of each crossword if multiple versions */
     val newestSummaries = groupedSummaries map {
-      case (fileName, listOfS3Objects) => {
+      case (_, listOfS3Objects) => {
         listOfS3Objects.sortWith(_.getLastModified.getTime > _.getLastModified.getTime).head.getKey
       }
     }
