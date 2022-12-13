@@ -1,0 +1,21 @@
+stacks:
+  - flexible
+regions:
+  - eu-west-1
+allowedStages:
+  - CODE
+  - PROD
+
+deployments:
+  crossword-pdf-uploader:
+    type: aws-lambda
+    parameters:
+      functionNames: [crossword-pdf-uploader-]
+      fileName: crossword-pdf-uploader.jar
+      prefixStack: false
+  crossword-xml-uploader:
+    type: aws-lambda
+    parameters:
+      functionNames: [crossword-xml-uploader-]
+      fileName: crossword-xml-uploader.jar
+      prefixStack: false
