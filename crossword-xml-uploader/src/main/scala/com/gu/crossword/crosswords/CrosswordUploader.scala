@@ -17,9 +17,10 @@ trait CrosswordUploader extends ComposerCrosswordIntegration with XmlProcessor {
       val crosswordXmlToCreatePage = process(XML.loadString(responseBody))
       println(s"creating page for crossword ${crosswordXmlFile.key} in flex.")
       createPage(crosswordXmlFile, crosswordXmlToCreatePage)
-    } else
+    } else {
       println(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}")
       println(s"Returned error is $responseBody")
+    }
   }
 
   private def buildRequest(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config) = {
