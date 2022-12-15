@@ -1,14 +1,14 @@
 package com.gu.crossword.crosswords
 
 import java.io.ByteArrayOutputStream
-import com.gu.crossword.Config
+import scala.jdk.CollectionConverters._
 
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
+import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.S3.s3Client
 
-import scala.collection.JavaConversions._
 
 trait CrosswordStore {
 
@@ -16,6 +16,7 @@ trait CrosswordStore {
     s3Client
       .listObjects(config.crosswordsBucketName)
       .getObjectSummaries
+      .asScala
       .toList
       .filter(_.getKey.endsWith(".xml"))
       .map(os => CrosswordXmlFile(os.getKey, getCrossword(os.getKey, config)))

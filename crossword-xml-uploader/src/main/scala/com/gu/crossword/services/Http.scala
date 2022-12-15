@@ -1,6 +1,6 @@
 package com.gu.crossword.services
 
-import com.squareup.okhttp.OkHttpClient
+import okhttp3.OkHttpClient
 
 object Http {
   lazy val httpClient: OkHttpClient = new OkHttpClient()

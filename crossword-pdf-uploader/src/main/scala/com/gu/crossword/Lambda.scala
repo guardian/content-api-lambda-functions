@@ -4,8 +4,8 @@ import java.util.{ Map => JMap }
 import com.amazonaws.services.lambda.runtime.{ RequestHandler, Context }
 import com.gu.crossword.models.CrosswordPdfFile
 import com.gu.crossword.stores.{ PublicPdfStore, CrosswordStore }
-import com.squareup.okhttp._
 import org.apache.http.HttpStatus
+import okhttp3.Response
 
 class Lambda
     extends RequestHandler[JMap[String, Object], Unit]
