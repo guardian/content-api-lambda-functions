@@ -9,7 +9,7 @@ import com.gu.crossword.models.{ CrosswordPdfFile, CrosswordPdfFileName }
 
 trait CrosswordStore extends S3Provider {
 
-  private val bucketName = "crossword-files-for-processing"
+  private val processingBucketName = "crossword-files-for-processing"
 
   def getCrosswordPdfFiles: List[CrosswordPdfFile] = {
     for {
@@ -20,12 +20,12 @@ trait CrosswordStore extends S3Provider {
   }
 
   def getCrossword(key: String): Array[Byte] = {
-    val obj: S3Object = s3Client.getObject(bucketName, key)
+    val obj: S3Object = s3Client.getObject(processingBucketName, key)
     download(obj)
   }
 
   private def getCrosswordPdfObjectSummaries: List[S3ObjectSummary] = {
-    s3Client.listObjects(bucketName).getObjectSummaries.asScala.toList
+    s3Client.listObjects(processingBucketName).getObjectSummaries.asScala.toList
       .collect { case os if os.getKey.endsWith(".pdf") => os }
   }
 
@@ -58,18 +58,23 @@ trait CrosswordStore extends S3Provider {
     out.toByteArray
   }
 
-  private def archiveCrosswordPdfFile(awsKey: String) = {
-    val archiveBucketName = "crossword-processed-files"
-    println(s"Moving $awsKey to bucket $archiveBucketName")
-    s3Client.copyObject(bucketName, awsKey, archiveBucketName, awsKey)
-    s3Client.deleteObject(bucketName, awsKey)
+  private def moveFileToS3Bucket(awsKey: String, bucketName: String): Unit = {
+    println(s"Moving $awsKey to bucket $bucketName")
+    s3Client.copyObject(processingBucketName, awsKey, bucketName, awsKey)
+    s3Client.deleteObject(processingBucketName, awsKey)
   }
 
-  def archiveProcessedPdfFiles(uploadedCrosswordPdfKey: String): Unit = {
-    println(s"Archiving all versions of $uploadedCrosswordPdfKey")
-    val uploadedCrosswordPdfKeyPrefix = uploadedCrosswordPdfKey.dropRight(4) // remove .pdf file extension
-    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(uploadedCrosswordPdfKeyPrefix)).map(_.getKey)
-    keysToArchive.foreach(archiveCrosswordPdfFile)
+  def archiveProcessedPdfFiles(awsKey: String): Unit = {
+    println(s"Archiving all versions of $awsKey")
+    val fileName = awsKey.dropRight(4) // remove .pdf file extension
+    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
+    keysToArchive.foreach(key => moveFileToS3Bucket(key, "crossword-processed-files"))
   }
 
+  def archiveFailedPdfFiles(awsKey: String): Unit = {
+    println(s"Moving all versions of $awsKey to failed bucket")
+    val fileName = awsKey.dropRight(4)
+    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
+    keysToArchive.foreach(key => moveFileToS3Bucket(key, "crossword-failed-files"))
+  }
 }

@@ -24,6 +24,7 @@ trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
     val putRecordsResult: PutRecordsResult = kinesisClient.putRecords(request)
     if (putRecordsResult.getFailedRecordCount > 0) {
       println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
+      archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
     } else {
       println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
       if (config.isProd) archiveCrosswordXMLFile(config, crosswordXmlFile.key)
