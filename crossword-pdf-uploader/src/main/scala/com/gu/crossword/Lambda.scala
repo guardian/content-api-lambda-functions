@@ -36,7 +36,10 @@ class Lambda
     } else if (response.code() == HttpStatus.SC_NOT_FOUND) {
       println(s"Looks like the crossword microapp could not find the relevant crossword for ${crosswordPdfFile.awsKey}. " +
         s"Are you sure its counterpart xml file has been uploaded first?")
-    } else println(s"Upload of crossword PDF location for ${crosswordPdfFile.awsKey} failed.")
+    } else {
+      println(s"Upload of crossword PDF location for ${crosswordPdfFile.awsKey} failed.")
+      if (config.isProd) archiveFailedPdfFiles(crosswordPdfFile.awsKey)
+    }
   }
 
 }

@@ -20,6 +20,7 @@ trait CrosswordUploader extends ComposerCrosswordIntegration with XmlProcessor {
     } else {
       println(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}")
       println(s"Returned error is $responseBody")
+      archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
     }
   }
 

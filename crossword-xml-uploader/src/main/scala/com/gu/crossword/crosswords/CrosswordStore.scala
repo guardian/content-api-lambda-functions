@@ -40,4 +40,11 @@ trait CrosswordStore {
     s3Client.deleteObject(config.crosswordsBucketName, awsKey)
   }
 
+  def archiveFailedCrosswordXMLFile(config: Config, awsKey: String): Unit = {
+    val processingFailedBucketName = "crossword-failed-files"
+    s3Client.copyObject(config.crosswordsBucketName, awsKey, processingFailedBucketName, awsKey)
+    if(s3Client.doesObjectExist(processingFailedBucketName, awsKey)) {
+      s3Client.deleteObject(config.crosswordsBucketName, awsKey)
+    }
+  }
 }
