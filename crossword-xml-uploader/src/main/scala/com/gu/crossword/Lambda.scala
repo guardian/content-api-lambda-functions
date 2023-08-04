@@ -22,6 +22,14 @@ class Lambda
     }
 
     println("The uploading of crossword xml files has finished.")
-  }
 
+    println("Archiving non-crossword files...")
+
+    for (nonCrosswordFileKey <- getNotCrosswordFileKeys(config)) {
+      println(s"Archiving $nonCrosswordFileKey")
+      archiveFailedCrosswordXMLFile(config, nonCrosswordFileKey)
+    }
+
+    println("Archiving complete")
+  }
 }

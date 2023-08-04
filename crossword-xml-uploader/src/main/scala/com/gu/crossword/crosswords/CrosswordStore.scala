@@ -12,6 +12,16 @@ import com.gu.crossword.services.S3.s3Client
 
 trait CrosswordStore {
 
+  def getNotCrosswordFileKeys(config: Config): List[String] = {
+    s3Client
+      .listObjects(config.crosswordsBucketName)
+      .getObjectSummaries
+      .asScala
+      .toList
+      .map(_.getKey)
+      .filterNot(key => key.endsWith(".xml") || key.endsWith(".pdf"))
+  }
+
   def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile] = {
     s3Client
       .listObjects(config.crosswordsBucketName)
