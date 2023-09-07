@@ -55,11 +55,24 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     fakeLambda.archiveFailedCalled should be(0)
   }
 
-  it should "archive as failure a processed crossword with an invalid response from the microapp" in {
+  it should "archive as failure a processed crossword with xml that XmlProcessor fails to parse" in {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
       uploader = (_, _) => Right(<invalid-xml/>.toString())
+    )
+
+    fakeLambda.handleRequest(null, null)
+
+    fakeLambda.archiveCalled should be(0)
+    fakeLambda.archiveFailedCalled should be(1)
+  }
+
+  it should "archive as failure a processed crossword with invalid" in {
+    val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
+    val fakeLambda = buildFakeLambda(
+      crosswordXmlFiles = List(crosswordXmlFile),
+      uploader = (_, _) => Right("not xml at all is it?")
     )
 
     fakeLambda.handleRequest(null, null)
