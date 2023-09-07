@@ -8,7 +8,11 @@ import okhttp3._
 
 import scala.util.Try
 
-object CrosswordUploader {
+trait CrosswordUploader {
+  def uploadCrossword(crosswordMicroAppUrl: String)(crosswordXmlFile: CrosswordXmlFile): Either[Throwable, Elem]
+}
+
+trait HttpCrosswordUploader extends CrosswordUploader {
   def uploadCrossword(crosswordMicroAppUrl: String)(crosswordXmlFile: CrosswordXmlFile): Either[Throwable, Elem] = {
     val requestBody: RequestBody = new MultipartBody.Builder()
       .setType(MultipartBody.FORM)

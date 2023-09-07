@@ -6,7 +6,11 @@ import com.gu.crossword.services.Kinesis
 import com.amazonaws.services.kinesis.model.{PutRecordsRequest, PutRecordsRequestEntry}
 import scala.xml._
 
-object ComposerOps {
+trait ComposerOps {
+  def createPage(composerCrosswordIntegrationStreamName: String)(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem): Either[Error, Unit]
+}
+
+trait KinesisComposerOps extends ComposerOps {
   def createPage(composerCrosswordIntegrationStreamName: String)(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem): Either[Error, Unit] = {
     val record = new PutRecordsRequestEntry()
       .withPartitionKey(crosswordXmlFile.key)

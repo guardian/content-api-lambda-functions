@@ -2,13 +2,19 @@ package com.gu.crossword
 
 import java.util.{Map => JMap}
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
-import com.gu.crossword.crosswords.ComposerOps._
-import com.gu.crossword.crosswords.CrosswordStore._
-import com.gu.crossword.crosswords.CrosswordUploader._
-import com.gu.crossword.crosswords.XmlProcessor
+import com.gu.crossword.crosswords._
+
+trait CrosswordUploaderLambda
+  extends RequestHandler[JMap[String, Object], Unit]
+    with ComposerOps
+    with CrosswordStore
+    with CrosswordUploader
 
 class Lambda
-    extends RequestHandler[JMap[String, Object], Unit] {
+    extends CrosswordUploaderLambda
+      with KinesisComposerOps
+      with S3CrosswordStore
+      with HttpCrosswordUploader {
 
   override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
     val config = new Config(context)

@@ -9,9 +9,13 @@ import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.S3.s3Client
 
+trait CrosswordStore {
+  def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile]
+  def archiveCrosswordXMLFile(config: Config, awsKey: String): Unit
+  def archiveFailedCrosswordXMLFile(config: Config, awsKey: String): Unit
+}
 
-object CrosswordStore {
-
+trait S3CrosswordStore extends CrosswordStore {
   def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile] = {
     s3Client
       .listObjects(config.crosswordsBucketName)

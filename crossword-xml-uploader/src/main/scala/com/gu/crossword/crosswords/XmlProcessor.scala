@@ -17,7 +17,6 @@ trait DateLogic {
 }
 
 object XmlProcessor extends DateLogic {
-
   def process(crosswordXml: Elem): Either[Throwable, Elem] = Try {
 
     implicit val xmlToProcess: Elem = crosswordXml
