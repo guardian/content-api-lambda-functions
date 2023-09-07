@@ -7,7 +7,7 @@ import com.gu.crossword.services.Kinesis
 import com.amazonaws.services.kinesis.model.{PutRecordsRequest, PutRecordsRequestEntry}
 import scala.xml._
 
-trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
+object Composer extends Kinesis {
 
   def createPage(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem)(implicit config: Config): Either[Error, Unit] = {
     val record = new PutRecordsRequestEntry()

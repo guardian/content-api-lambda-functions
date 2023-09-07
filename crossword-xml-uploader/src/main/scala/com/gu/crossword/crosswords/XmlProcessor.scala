@@ -14,7 +14,7 @@ trait DateLogic {
 
 }
 
-trait XmlProcessor extends DateLogic {
+object XmlProcessor extends DateLogic {
 
   def process(crosswordXml: Elem): Elem = {
 
@@ -62,5 +62,4 @@ trait XmlProcessor extends DateLogic {
       reference <- references
     } yield ((reference \\ "type").text, (reference \\ "token").text)
   }
-
 }

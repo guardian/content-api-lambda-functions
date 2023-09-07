@@ -10,7 +10,7 @@ import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.S3.s3Client
 
 
-trait CrosswordStore {
+object CrosswordStore {
 
   def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile] = {
     s3Client

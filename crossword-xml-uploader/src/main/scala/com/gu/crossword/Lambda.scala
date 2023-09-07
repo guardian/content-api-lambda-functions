@@ -2,13 +2,12 @@ package com.gu.crossword
 
 import java.util.{Map => JMap}
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
-import com.gu.crossword.crosswords.models._
-import com.gu.crossword.crosswords.{CrosswordStore, CrosswordUploader}
+import com.gu.crossword.crosswords.Composer._
+import com.gu.crossword.crosswords.CrosswordStore._
+import com.gu.crossword.crosswords.CrosswordUploader._
 
 class Lambda
-    extends RequestHandler[JMap[String, Object], Unit]
-    with CrosswordUploader
-    with CrosswordStore {
+    extends RequestHandler[JMap[String, Object], Unit] {
 
   override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
 
@@ -16,7 +15,7 @@ class Lambda
 
     println("The uploading of crossword xml files has started.")
 
-    getCrosswordXmlFiles(config).map { crosswordXmlFile =>
+    getCrosswordXmlFiles(config).foreach { crosswordXmlFile =>
       (for {
         crosswordXml <- uploadCrossword(crosswordXmlFile)
         _ <- createPage(crosswordXmlFile, crosswordXml)
