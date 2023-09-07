@@ -17,13 +17,14 @@ trait HttpCrosswordClientOps extends CrosswordClientOps {
       .build()
 
     val request = new Request.Builder().url(url).post(requestBody).build()
-
     val response: Response = Http.httpClient.newCall(request).execute()
 
     if(response.isSuccessful) {
-      Right(response.body.string)
+      val responseBody = response.body.string
+      response.body.close()
+      Right(responseBody)
     } else {
-      Left(new Error(s"Crossword upload failed for crossword: $id"))
+      Left(new Error(s"Crossword upload failed for crossword: $id, got response code: ${response.code()}"))
     }
   }
 }

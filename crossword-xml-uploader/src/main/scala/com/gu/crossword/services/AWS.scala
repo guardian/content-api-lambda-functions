@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import scala.util.Try
 
 object AWS {
+  // This environment variable is set by AWS Lambda
   lazy val inAws = Try(sys.env("AWS_EXECUTION_ENV")).isSuccess
   lazy val composerCredentials = new ProfileCredentialsProvider("composer")
 

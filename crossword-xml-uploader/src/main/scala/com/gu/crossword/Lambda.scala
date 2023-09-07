@@ -29,7 +29,7 @@ class Lambda
         _ <- createPage(config.composerCrosswordIntegrationStreamName)(crosswordXmlFile, crosswordXml)
       } yield ()) match {
         case Left(error) =>
-          println(s"Failed to upload crossword ${crosswordXmlFile.key} with error: $error")
+          println(s"Failed to upload crossword ${crosswordXmlFile.key} with error: ${error.getMessage}")
           archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
         case Right(_) =>
           println(s"Successfully uploaded crossword ${crosswordXmlFile.key}")

@@ -24,6 +24,8 @@ class Config(val context: Context) {
       "crossword-files-for-processing-code"
 
   private def loadConfig() = {
+    println("Loading config for stage: " + stage)
+
     val configFileKey = s"crossword-xml-uploader/$stage/config.properties"
     val configInputStream = s3Client.getObject("crossword-uploader-config", configFileKey).getObjectContent
     val configFile: Properties = new Properties()
