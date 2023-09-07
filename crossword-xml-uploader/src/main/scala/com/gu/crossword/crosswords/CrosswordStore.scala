@@ -10,7 +10,7 @@ import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.AWS.s3Client
 
 trait CrosswordStore {
-  def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile]
+  def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile]
   def archiveCrosswordXMLFile(config: Config, awsKey: String): Unit
   def archiveFailedCrosswordXMLFile(config: Config, awsKey: String): Unit
 }
