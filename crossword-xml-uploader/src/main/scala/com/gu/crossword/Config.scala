@@ -2,7 +2,7 @@ package com.gu.crossword
 
 import java.util.Properties
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.crossword.services.S3.s3Client
+import com.gu.crossword.services.AWS.s3Client
 import scala.util.Try
 
 class Config(val context: Context) {
@@ -12,7 +12,10 @@ class Config(val context: Context) {
   private val config = loadConfig()
 
   val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
-  val composerCrosswordIntegrationStreamName = Option(config.getProperty("composerCrosswordIntegration.streamName")) getOrElse sys.error("'composerCrosswordIntegration.streamName' property missing")
+  val composerCrosswordIntegrationStreamName = Option(
+    config.getProperty("composerCrosswordIntegration.streamName")).getOrElse(
+      sys.error("'composerCrosswordIntegration.streamName' property missing")
+    )
 
   val crosswordsBucketName: String =
     if (isProd)

@@ -4,17 +4,18 @@ import java.util.{Map => JMap}
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.gu.crossword.crosswords._
 
-trait CrosswordUploaderLambda
+trait CrosswordUploaderLambdaOps
   extends RequestHandler[JMap[String, Object], Unit]
     with ComposerOps
     with CrosswordStore
     with CrosswordUploader
 
 class Lambda
-    extends CrosswordUploaderLambda
+    extends CrosswordUploaderLambdaOps
       with KinesisComposerOps
       with S3CrosswordStore
-      with HttpCrosswordUploader {
+      with CrosswordUploader
+      with HttpCrosswordClientOps {
 
   override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
     val config = new Config(context)

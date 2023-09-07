@@ -2,9 +2,10 @@ package com.gu.crossword.crosswords
 
 import java.nio.ByteBuffer
 import com.gu.crossword.crosswords.models._
-import com.gu.crossword.services.Kinesis
+import com.gu.crossword.services.AWS.kinesisClient
 import com.amazonaws.services.kinesis.model.{PutRecordsRequest, PutRecordsRequestEntry}
 import scala.xml._
+
 
 trait ComposerOps {
   def createPage(composerCrosswordIntegrationStreamName: String)(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem): Either[Error, Unit]
@@ -20,7 +21,7 @@ trait KinesisComposerOps extends ComposerOps {
       .withStreamName(composerCrosswordIntegrationStreamName)
       .withRecords(record)
 
-    if (Kinesis.kinesisClient.putRecords(request).getFailedRecordCount > 0) {
+    if (kinesisClient.putRecords(request).getFailedRecordCount > 0) {
       Left(new Error(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed."))
     } else {
       Right(())

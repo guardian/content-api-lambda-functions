@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
 import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
-import com.gu.crossword.services.S3.s3Client
+import com.gu.crossword.services.AWS.s3Client
 
 trait CrosswordStore {
   def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile]
