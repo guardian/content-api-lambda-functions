@@ -13,7 +13,7 @@ class XmlProcessorTest extends AnyFlatSpec with Matchers {
 
   val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
   val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
-  val processedXml = process(crosswordMicroAppResponseXml)
+  val processedXml = process(crosswordMicroAppResponseXml).getOrElse(throw new Exception("Failed to process xml."))
 
   it should "process the notes correctly." in {
     (processedXml \\ "crossword").head.attribute("notes").get.text should be("Notes for crossword article")

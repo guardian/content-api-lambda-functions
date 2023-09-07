@@ -2,11 +2,14 @@ package com.gu.crossword.crosswords
 
 import com.gu.crossword.crosswords.models._
 import com.gu.crossword.services.Http.httpClient
+
 import scala.xml.{Elem, XML}
 import okhttp3._
 
+import scala.util.Try
+
 object CrosswordUploader {
-  def uploadCrossword(crosswordMicroAppUrl: String)(crosswordXmlFile: CrosswordXmlFile): Either[Error, Elem] = {
+  def uploadCrossword(crosswordMicroAppUrl: String)(crosswordXmlFile: CrosswordXmlFile): Either[Throwable, Elem] = {
     val requestBody: RequestBody = new MultipartBody.Builder()
       .setType(MultipartBody.FORM)
       .addFormDataPart("result_format", "xml")
@@ -22,7 +25,9 @@ object CrosswordUploader {
     if (!response.isSuccessful) {
       Left(new Error(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}"))
     } else {
-      Right(XmlProcessor.process(XML.loadString(responseBody)))
+      Try {
+        XML.loadString(responseBody)
+      }.toEither
     }
   }
 }

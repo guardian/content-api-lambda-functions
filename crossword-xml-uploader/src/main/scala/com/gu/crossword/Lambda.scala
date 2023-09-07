@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.gu.crossword.crosswords.ComposerOps._
 import com.gu.crossword.crosswords.CrosswordStore._
 import com.gu.crossword.crosswords.CrosswordUploader._
+import com.gu.crossword.crosswords.XmlProcessor
 
 class Lambda
     extends RequestHandler[JMap[String, Object], Unit] {
@@ -16,7 +17,8 @@ class Lambda
 
     getCrosswordXmlFiles(config).foreach { crosswordXmlFile =>
       (for {
-        crosswordXml <- uploadCrossword(config.crosswordMicroAppUrl)(crosswordXmlFile)
+        rawXml <- uploadCrossword(config.crosswordMicroAppUrl)(crosswordXmlFile)
+        crosswordXml <- XmlProcessor.process(rawXml)
         _ <- createPage(config.composerCrosswordIntegrationStreamName)(crosswordXmlFile, crosswordXml)
       } yield ()) match {
         case Left(error) =>
