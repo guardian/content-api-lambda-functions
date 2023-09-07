@@ -1,18 +1,15 @@
 package com.gu.crossword.crosswords
 
 import java.nio.ByteBuffer
-
 import com.gu.crossword.Config
-import com.gu.crossword.crosswords.models.CrosswordXmlFile
+import com.gu.crossword.crosswords.models._
 import com.gu.crossword.services.Kinesis
-import com.amazonaws.services.kinesis.model.{ PutRecordsRequestEntry, PutRecordsRequest, PutRecordsResult }
-
+import com.amazonaws.services.kinesis.model.{PutRecordsRequest, PutRecordsRequestEntry}
 import scala.xml._
 
 trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
 
-  def createPage(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem)(implicit config: Config): Unit = {
-
+  def createPage(crosswordXmlFile: CrosswordXmlFile, crosswordXmlToCreatePage: Elem)(implicit config: Config): Either[Error, Unit] = {
     val record = new PutRecordsRequestEntry()
       .withPartitionKey(crosswordXmlFile.key)
       .withData(ByteBuffer.wrap(crosswordXmlToCreatePage.toString.getBytes))
@@ -21,14 +18,10 @@ trait ComposerCrosswordIntegration extends Kinesis with CrosswordStore {
       .withStreamName(config.composerCrosswordIntegrationStreamName)
       .withRecords(record)
 
-    val putRecordsResult: PutRecordsResult = kinesisClient.putRecords(request)
-    if (putRecordsResult.getFailedRecordCount > 0) {
-      println(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed.")
-      archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
+    if (kinesisClient.putRecords(request).getFailedRecordCount > 0) {
+      Left(new Error(s"Crossword page creation request to Composer for crossword ${crosswordXmlFile.key} failed."))
     } else {
-      println(s"Crossword page creation request sent to Composer for crossword ${crosswordXmlFile.key}.")
-      if (config.isProd) archiveCrosswordXMLFile(config, crosswordXmlFile.key)
+      Right()
     }
   }
-
 }
