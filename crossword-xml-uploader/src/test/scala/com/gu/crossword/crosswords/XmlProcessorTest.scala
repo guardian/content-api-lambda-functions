@@ -6,7 +6,8 @@ import scala.xml.XML
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class XmlProcessorTest extends AnyFlatSpec with Matchers with XmlProcessor {
+class XmlProcessorTest extends AnyFlatSpec with Matchers {
+  import XmlProcessor._
 
   behavior of "XmlProcessorTest - should correctly transform crossword microapp xml to flex integration xml."
 

@@ -4,7 +4,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.kinesis.AmazonKinesisAsync
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder
 
-trait Kinesis {
+object Kinesis {
 
   lazy val kinesisClient: AmazonKinesisAsync = AmazonKinesisAsyncClientBuilder
     .standard()
