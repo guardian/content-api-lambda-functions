@@ -8,9 +8,10 @@ trait CrosswordUploaderLambda
   extends RequestHandler[JMap[String, Object], Unit]
     with ComposerOps
     with CrosswordStore
+    with CrosswordConfigRetriever
     with CrosswordUploader {
   def handleRequest(event: JMap[String, Object], context: Context): Unit = {
-    val config = new Config(context)
+    val config = getConfig(context)
 
     println("The uploading of crossword xml files has started.")
 
@@ -23,10 +24,10 @@ trait CrosswordUploaderLambda
         case Left(error) =>
           println(s"Failed to upload crossword ${crosswordXmlFile.key} with error: ${error.getMessage}")
           error.getStackTrace.foreach(println)
-          archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
+          archiveFailedCrosswordXMLFile(config.crosswordsBucketName, crosswordXmlFile.key)
         case Right(_) =>
           println(s"Successfully uploaded crossword ${crosswordXmlFile.key}")
-          archiveCrosswordXMLFile(config, crosswordXmlFile.key)
+          archiveCrosswordXMLFile(config.crosswordsBucketName, crosswordXmlFile.key)
       }
     }
 
@@ -40,3 +41,4 @@ class Lambda
       with S3CrosswordStore
       with CrosswordUploader
       with HttpCrosswordClientOps
+      with S3CrosswordConfigRetriever

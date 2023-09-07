@@ -1,6 +1,7 @@
 package com.gu.crossword
 
-import com.gu.crossword.crosswords.models.CrosswordXmlFile
+import com.amazonaws.services.lambda.runtime.Context
+import com.gu.crossword.crosswords.models.{CrosswordLambdaConfig, CrosswordXmlFile}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -16,11 +17,11 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     var archiveCalled = 0
     var archiveFailedCalled = 0
 
-    def archiveCrosswordXMLFile(config: Config, awsKey: String): Unit = {
+    def archiveCrosswordXMLFile(bucketName: String, awsKey: String): Unit = {
       archiveCalled += 1
     }
 
-    def archiveFailedCrosswordXMLFile(config: Config, awsKey: String): Unit = {
+    def archiveFailedCrosswordXMLFile(bucketName: String, awsKey: String): Unit = {
       archiveFailedCalled += 1
     }
   }
@@ -36,6 +37,12 @@ class LambdaTest extends AnyFlatSpec with Matchers {
       override def createPage(streamName: String)(key: String, xmlData: Elem): Either[Error, Unit] = pageCreator(key, xmlData)
 
       override def upload(url: String)(id: String, data: Array[Byte]): Either[Throwable, String] = uploader(id, data)
+
+      override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
+        crosswordsBucketName = "crosswords-bucket",
+        crosswordMicroAppUrl = "https://crossword-microapp-url",
+        composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
+      )
     }
   }
 
