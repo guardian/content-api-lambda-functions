@@ -32,7 +32,10 @@ trait CrosswordUploaderLambda
 
     println("The uploading of crossword xml files has started.")
 
-    val (failures, successes) = getCrosswordXmlFiles(config.crosswordsBucketName).map { crosswordXmlFile =>
+    val crosswordXmlFiles = getCrosswordXmlFiles(config.crosswordsBucketName)
+    println(s"Found ${crosswordXmlFiles.size} crossword file(s) to process")
+
+    val (failures, successes) = crosswordXmlFiles.map { crosswordXmlFile =>
       doUpload(
         url = config.crosswordMicroAppUrl,
         streamName = config.composerCrosswordIntegrationStreamName,

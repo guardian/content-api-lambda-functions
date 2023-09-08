@@ -15,8 +15,8 @@ trait CrosswordStore {
 }
 
 trait S3CrosswordStore extends CrosswordStore {
-  def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] = {
-    val crosswordXmlFiles = s3Client
+  def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] =
+    s3Client
       .listObjects(crosswordsBucketName)
       .getObjectSummaries
       .asScala
@@ -24,10 +24,6 @@ trait S3CrosswordStore extends CrosswordStore {
       .filter(_.getKey.endsWith(".xml"))
       .map(os => CrosswordXmlFile(os.getKey, getCrossword(crosswordsBucketName, os.getKey)))
 
-    println(s"Found ${crosswordXmlFiles.size} crossword file(s) to process")
-
-    crosswordXmlFiles
-  }
 
   private def getCrossword(bucketName: String, key: String): Array[Byte] = {
     val obj: S3Object = s3Client.getObject(bucketName, key)
