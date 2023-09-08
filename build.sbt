@@ -7,6 +7,7 @@ lazy val commonSettings = Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
     "com.amazonaws" % "aws-java-sdk-s3" % awsSdk,
     "com.squareup.okhttp3" % "okhttp" % "4.10.0",
+    "com.squareup.okhttp3" % "mockwebserver" % "4.10.0" % "test",
     "com.google.guava" % "guava" % "31.1-jre",
     "org.scalatest" %% "scalatest" % "3.2.14" % "test"
   ),
