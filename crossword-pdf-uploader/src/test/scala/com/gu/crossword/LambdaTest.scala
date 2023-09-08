@@ -10,6 +10,7 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
 
+
 class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
   type PageCreator = (String, Elem) => Try[Unit]

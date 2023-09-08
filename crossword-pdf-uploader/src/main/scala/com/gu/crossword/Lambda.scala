@@ -62,6 +62,13 @@ trait CrosswordPdfUploaderLambda
       val failedKeys = failures.map(_._1).mkString(", ")
       throw new Exception(s"Failures detected when uploading crossword PDF files (${failedKeys})!")
     }
+
+    successes.foreach { key =>
+      println(s"Successfully uploaded crossword PDF: ${key}")
+      archiveProcessedPdfFiles(config.crosswordsBucketName, key)
+    }
+
+    println("The uploading of crossword PDF files has finished.")
   }
 }
 
