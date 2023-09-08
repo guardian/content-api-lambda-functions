@@ -1,4 +1,4 @@
-package com.gu.crossword.models
+package com.gu.crossword.pdfuploader.models
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

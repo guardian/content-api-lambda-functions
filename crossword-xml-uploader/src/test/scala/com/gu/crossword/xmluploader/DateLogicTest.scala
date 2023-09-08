@@ -1,4 +1,4 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

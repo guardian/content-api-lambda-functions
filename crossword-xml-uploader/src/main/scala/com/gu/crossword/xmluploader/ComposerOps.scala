@@ -1,8 +1,8 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import java.nio.ByteBuffer
-import com.gu.crossword.services.AWS.kinesisClient
 import com.amazonaws.services.kinesis.model.{PutRecordsRequest, PutRecordsRequestEntry}
+import com.gu.crossword.services.AWS.kinesisClient
 
 import scala.util.Try
 import scala.xml._

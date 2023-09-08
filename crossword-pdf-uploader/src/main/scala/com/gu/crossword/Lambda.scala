@@ -1,44 +1,67 @@
 package com.gu.crossword
 
-import java.util.{ Map => JMap }
-import com.amazonaws.services.lambda.runtime.{ RequestHandler, Context }
-import com.gu.crossword.models.CrosswordPdfFile
-import com.gu.crossword.stores.{ PublicPdfStore, CrosswordStore }
-import org.apache.http.HttpStatus
-import okhttp3.Response
+import java.util.{Map => JMap}
+import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
+import com.gu.crossword.pdfuploader.models.CrosswordPdfFile
+import com.gu.crossword.pdfuploader.{CrosswordConfigRetriever, CrosswordPdfStore, CrosswordPdfUploader, HttpCrosswordPdfUploader, PublicPdfStore, S3CrosswordConfigRetriever, S3CrosswordPdfStore, S3PublicPdfStore}
 
-class Lambda
-    extends RequestHandler[JMap[String, Object], Unit]
-    with CrosswordUploader
-    with CrosswordStore
+import scala.util.{Failure, Success}
+
+trait CrosswordPdfUploaderLambda
+  extends RequestHandler[JMap[String, Object], Unit]
+    with CrosswordConfigRetriever
+    with CrosswordPdfUploader
+    with CrosswordPdfStore
     with PublicPdfStore {
 
-  override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
-    implicit val config = new Config(context)
+  def doUpload(bucketName: String, fileLocation: String, uploadUrl: String, pdfFile: CrosswordPdfFile): Either[(String, Throwable), String] = {
+    val uploadResult = for {
+      location <- uploadPdfCrosswordFile(bucketName, fileLocation, pdfFile)
+      _ <- uploadPdfCrosswordLocation(uploadUrl, pdfFile, location)
+    } yield ()
 
-    println("The uploading of crossword pdf files has started.")
-
-    for {
-      crosswordPdfFile <- getCrosswordPdfFiles
-    } yield {
-      val location = uploadPdfCrosswordFile(crosswordPdfFile)
-      handleResponse(uploadPdfCrosswordLocation(crosswordPdfFile, location), crosswordPdfFile)
+    uploadResult match {
+      case Success(_) => Right(pdfFile.awsKey)
+      case Failure(error) => Left((pdfFile.awsKey, error))
     }
-
-    println("The uploading of crossword pdf files has finished.")
   }
 
-  private def handleResponse(response: Response, crosswordPdfFile: CrosswordPdfFile)(implicit config: Config) = {
-    println(s"Microapp response: '${response.message}' with status code: ${response.code}")
-    if (response.isSuccessful) {
-      if (config.isProd) archiveProcessedPdfFiles(crosswordPdfFile.awsKey)
-      println(s"Successfully uploaded crossword ${crosswordPdfFile.awsKey}")
-    } else if (response.code() == HttpStatus.SC_NOT_FOUND) {
-      println(s"Looks like the crossword microapp could not find the relevant crossword for ${crosswordPdfFile.awsKey}. " +
-        s"Are you sure its counterpart xml file has been uploaded first?")
-    } else {
-      println(s"Upload of crossword PDF location for ${crosswordPdfFile.awsKey} failed.")
-      if (config.isProd) archiveFailedPdfFiles(crosswordPdfFile.awsKey)
+  def handleRequest(event: JMap[String, Object], context: Context): Unit = {
+    implicit val config = getConfig(context)
+
+    println("The uploading of crossword PDF files has started.")
+
+    val crosswordPdfFiles = getCrosswordPdfFiles()
+
+    val (failures, successes) = crosswordPdfFiles.map { pdfFile =>
+      doUpload(
+        bucketName = config.crosswordPdfPublicBucketName,
+        fileLocation = config.crosswordPdfPublicFileLocation,
+        uploadUrl = config.crosswordMicroAppUrl,
+        pdfFile = pdfFile
+      )
+    } partitionMap(identity)
+
+    failures.foreach {
+      case (key, error) =>
+        println(s"Failed to upload crossword PDF ${key} with error: ${error.getMessage}")
+        error.getStackTrace.foreach(println)
+        archiveFailedPdfFiles(config.crosswordsBucketName, key)
     }
+
+    successes.foreach { key =>
+      println(s"Successfully uploaded crossword PDF: ${key}")
+      archiveProcessedPdfFiles(config.crosswordsBucketName, key)
+    }
+
+    println("The uploading of crossword PDF files has finished.")
   }
 }
+
+class Lambda
+  extends CrosswordPdfUploaderLambda
+    with S3CrosswordConfigRetriever
+    with HttpCrosswordPdfUploader
+    with S3CrosswordPdfStore
+    with S3PublicPdfStore
+

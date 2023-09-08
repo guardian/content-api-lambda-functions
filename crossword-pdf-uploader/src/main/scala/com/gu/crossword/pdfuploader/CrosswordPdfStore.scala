@@ -1,25 +1,30 @@
-package com.gu.crossword.stores
+package com.gu.crossword.pdfuploader
+
+import com.amazonaws.services.s3.model.{S3Object, S3ObjectSummary}
+import com.google.common.io.ByteStreams
+import com.gu.crossword.pdfuploader.models.{CrosswordPdfFile, CrosswordPdfFileName}
+import com.gu.crossword.services.AWS.s3Client
 
 import java.io.ByteArrayOutputStream
 import scala.jdk.CollectionConverters._
 
-import com.amazonaws.services.s3.model.{ S3ObjectSummary, S3Object }
-import com.google.common.io.ByteStreams
-import com.gu.crossword.models.{ CrosswordPdfFile, CrosswordPdfFileName }
+trait CrosswordPdfStore {
+  def getCrosswordPdfFiles(): List[CrosswordPdfFile]
+  def archiveProcessedPdfFiles(bucketName: String, key: String): Unit
+  def archiveFailedPdfFiles(bucketName: String, key: String): Unit
+}
 
-trait CrosswordStore extends S3Provider {
+trait S3CrosswordPdfStore extends CrosswordPdfStore {
 
-  private val processingBucketName = "crossword-files-for-processing"
-
-  def getCrosswordPdfFiles: List[CrosswordPdfFile] = {
+  def getCrosswordPdfFiles(): List[CrosswordPdfFile] = {
     for {
       key <- getCrosswordKeys
       crosswordPdfFileName <- CrosswordPdfFileName(key)
       if !isFutureCrossword(crosswordPdfFileName)
-    } yield CrosswordPdfFile(crosswordPdfFileName.fileName, crosswordPdfFileName, getCrossword(key))
+    } yield CrosswordPdfFile(crosswordPdfFileName.fileName, crosswordPdfFileName, getObject(key))
   }
 
-  def getCrossword(key: String): Array[Byte] = {
+  private def getObject(key: String): Array[Byte] = {
     val obj: S3Object = s3Client.getObject(processingBucketName, key)
     download(obj)
   }
@@ -58,23 +63,27 @@ trait CrosswordStore extends S3Provider {
     out.toByteArray
   }
 
-  private def moveFileToS3Bucket(awsKey: String, bucketName: String): Unit = {
-    println(s"Moving $awsKey to bucket $bucketName")
-    s3Client.copyObject(processingBucketName, awsKey, bucketName, awsKey)
-    s3Client.deleteObject(processingBucketName, awsKey)
+  private def moveFileToS3Bucket(sourceBucketName: String, targetBucketName: String, key: String): Unit = {
+    println(s"Moving $key to bucket $targetBucketName")
+    s3Client.copyObject(sourceBucketName, key, targetBucketName, key)
+    s3Client.deleteObject(sourceBucketName, key)
   }
 
-  def archiveProcessedPdfFiles(awsKey: String): Unit = {
-    println(s"Archiving all versions of $awsKey")
-    val fileName = awsKey.dropRight(4) // remove .pdf file extension
+  def archiveProcessedPdfFiles(bucketName: String, key: String): Unit = {
+    val archiveBucketName = "crossword-processed-files"
+
+    println(s"Archiving all versions of $key")
+    val fileName = key.dropRight(4) // remove .pdf file extension
     val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
-    keysToArchive.foreach(key => moveFileToS3Bucket(key, "crossword-processed-files"))
+    keysToArchive.foreach(key => moveFileToS3Bucket(bucketName, archiveBucketName, key))
   }
 
-  def archiveFailedPdfFiles(awsKey: String): Unit = {
-    println(s"Moving all versions of $awsKey to failed bucket")
-    val fileName = awsKey.dropRight(4)
+  def archiveFailedPdfFiles(bucketName: String, key: String): Unit = {
+    val processingFailedBucketName = "crossword-failed-files"
+
+    println(s"Moving all versions of $key to failed bucket")
+    val fileName = key.dropRight(4) // remove .pdf file extension
     val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
-    keysToArchive.foreach(key => moveFileToS3Bucket(key, "crossword-failed-files"))
+    keysToArchive.foreach(key => moveFileToS3Bucket(bucketName, processingFailedBucketName, key))
   }
 }

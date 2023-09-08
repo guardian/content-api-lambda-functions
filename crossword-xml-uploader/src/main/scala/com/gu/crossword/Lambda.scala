@@ -2,17 +2,17 @@ package com.gu.crossword
 
 import java.util.{Map => JMap}
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
-import com.gu.crossword.crosswords._
-import com.gu.crossword.crosswords.models.CrosswordXmlFile
+import com.gu.crossword.xmluploader._
+import com.gu.crossword.xmluploader.models.CrosswordXmlFile
 
 import scala.util.{Failure, Success, Try}
 
-trait CrosswordUploaderLambda
+trait CrosswordXmlUploaderLambda
   extends RequestHandler[JMap[String, Object], Unit]
+    with CrosswordConfigRetriever
     with ComposerOps
     with CrosswordStore
-    with CrosswordConfigRetriever
-    with CrosswordUploader {
+    with CrosswordXmlUploader {
 
   private def doUpload(url: String, streamName: String, crosswordXmlFile: CrosswordXmlFile): Either[(String, Throwable), String] = {
     val uploadResult = for {
@@ -20,7 +20,6 @@ trait CrosswordUploaderLambda
       crosswordXml <- XmlProcessor.process(rawXml)
       _ <- createPage(streamName)(crosswordXmlFile.key, crosswordXml)
     } yield ()
-
     uploadResult match {
       case Success(_) => Right(crosswordXmlFile.key)
       case Failure(error) => Left((crosswordXmlFile.key, error))
@@ -92,9 +91,10 @@ trait CrosswordUploaderLambda
 }
 
 class Lambda
-  extends CrosswordUploaderLambda
+  extends CrosswordXmlUploaderLambda
     with KinesisComposerOps
     with S3CrosswordStore
-    with CrosswordUploader
+    with CrosswordXmlUploader
     with HttpCrosswordClientOps
     with S3CrosswordConfigRetriever
+

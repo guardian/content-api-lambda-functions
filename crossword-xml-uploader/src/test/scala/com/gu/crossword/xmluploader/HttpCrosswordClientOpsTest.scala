@@ -1,4 +1,4 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import okhttp3.mockwebserver.MockResponse
 import org.scalatest.TryValues

@@ -1,8 +1,8 @@
 package com.gu.crossword
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.crossword.crosswords.HttpCrosswordClientOps
-import com.gu.crossword.crosswords.models.{CrosswordLambdaConfig, CrosswordXmlFile}
+import com.gu.crossword.xmluploader.HttpCrosswordClientOps
+import com.gu.crossword.xmluploader.models.{CrosswordXmlLambdaConfig, CrosswordXmlFile}
 import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -18,7 +18,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
   type PageCreator = (String, Elem) => Try[Unit]
   type Uploader = (String, Array[Byte]) => Try[String]
 
-  trait FakeLambda extends CrosswordUploaderLambda {
+  trait FakeLambda extends CrosswordXmlUploaderLambda {
     var archiveCalled = 0
     var archiveFailedCalled = 0
 
@@ -43,7 +43,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
       override def upload(url: String)(id: String, data: Array[Byte]): Try[String] = uploader(id, data)
 
-      override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
+      override def getConfig(context: Context): CrosswordXmlLambdaConfig = CrosswordXmlLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = "https://crossword-microapp-url",
         crosswordV2Url = None,
@@ -143,7 +143,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] = List(crosswordXmlFile)
       override def createPage(streamName: String)(key: String, xmlData: Elem): Try[Unit] = Success(())
 
-      override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
+      override def getConfig(context: Context): CrosswordXmlLambdaConfig = CrosswordXmlLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = baseUrl,
         crosswordV2Url = Some("https://crossword-v2-url"),
