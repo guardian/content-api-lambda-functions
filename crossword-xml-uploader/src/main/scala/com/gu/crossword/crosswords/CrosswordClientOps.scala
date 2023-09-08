@@ -3,15 +3,15 @@ package com.gu.crossword.crosswords
 import com.gu.crossword.services.Http
 import okhttp3._
 
-import scala.util.{Try, Success, Failure}
+import scala.util.Try
 
 
 trait CrosswordClientOps {
-  def upload(url: String)(id: String, data: Array[Byte]): Either[Throwable, String]
+  def upload(url: String)(id: String, data: Array[Byte]): Try[String]
 }
 
 trait HttpCrosswordClientOps extends CrosswordClientOps {
-  def upload(url: String)(id: String, data: Array[Byte]): Either[Throwable, String] = Try {
+  def upload(url: String)(id: String, data: Array[Byte]): Try[String] = Try {
     val requestBody: RequestBody = new MultipartBody.Builder()
       .setType(MultipartBody.FORM)
       .addFormDataPart("result_format", "xml")
@@ -31,14 +31,5 @@ trait HttpCrosswordClientOps extends CrosswordClientOps {
       response.body.close()
       responseBody
     }
-  } match {
-    // Catch any exceptions thrown by the Try and return them as a Left
-    case Success(responseBody) => Right(responseBody)
-    case Failure(error) => Left(
-      new Error(
-        s"Crossword upload failed for crossword: $id, got error: ${error.getMessage}\n" +
-          error.getStackTrace.mkString("\n")
-      )
-    )
   }
 }

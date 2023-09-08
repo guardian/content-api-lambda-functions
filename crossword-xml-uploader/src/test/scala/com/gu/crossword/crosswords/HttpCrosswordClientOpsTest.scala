@@ -1,11 +1,11 @@
 package com.gu.crossword.crosswords
 
 import okhttp3.mockwebserver.MockResponse
-import org.scalatest.EitherValues
+import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with EitherValues {
+class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with TryValues {
 
   import okhttp3.mockwebserver.MockWebServer
 
@@ -23,7 +23,7 @@ class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with EitherVa
     mockHttpServer.enqueue(new MockResponse().setBody(expectedResponse));
 
     val result = httpCrosswordClientOps.upload(baseUrl)("id", Array.empty)
-    result.value shouldBe expectedResponse
+    result.get shouldBe expectedResponse
 
     mockHttpServer.shutdown()
   }
@@ -38,8 +38,7 @@ class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with EitherVa
     mockHttpServer.enqueue(new MockResponse().setBody(expectedResponse).setStatus("HTTP/1.1 500 Internal Server Error"));
 
     val result = httpCrosswordClientOps.upload(baseUrl)("id", Array.empty)
-    result shouldBe a [Left[_, _]]
-    result.left.value.getMessage should include ("got response code: 500")
+    result.failed.get.getMessage should include ("got response code: 500")
 
     mockHttpServer.shutdown()
   }
@@ -49,8 +48,8 @@ class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with EitherVa
     mockHttpServer.start()
     val baseUrl = mockHttpServer.url("/upload").toString
 
-    val result =  httpCrosswordClientOps.upload(baseUrl)("id", Array.empty)
-    result shouldBe a [Left[_, _]]
+    val result = httpCrosswordClientOps.upload(baseUrl)("id", Array.empty)
+    result.failed.get.getMessage should include ("timeout")
 
     mockHttpServer.shutdown()
   }

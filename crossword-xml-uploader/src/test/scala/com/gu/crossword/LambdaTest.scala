@@ -2,16 +2,18 @@ package com.gu.crossword
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.crossword.crosswords.models.{CrosswordLambdaConfig, CrosswordXmlFile}
+import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
 import scala.xml.{Elem, XML}
 
-class LambdaTest extends AnyFlatSpec with Matchers {
+class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
-  type PageCreator = (String, Elem) => Either[Error, Unit]
-  type Uploader = (String, Array[Byte]) => Either[Throwable, String]
+  type PageCreator = (String, Elem) => Try[Unit]
+  type Uploader = (String, Array[Byte]) => Try[String]
 
   trait FakeLambda extends CrosswordUploaderLambda {
     var archiveCalled = 0
@@ -28,15 +30,15 @@ class LambdaTest extends AnyFlatSpec with Matchers {
 
   def buildFakeLambda(
                        crosswordXmlFiles: List[CrosswordXmlFile] = List.empty,
-                       pageCreator: PageCreator = (_, _) => Right(()),
-                       uploader: Uploader = (_, _) => Right(<crossword/>.toString()),
+                       pageCreator: PageCreator = (_, _) => Success(()),
+                       uploader: Uploader = (_, _) => Success(<crossword/>.toString()),
                      ) = {
     new FakeLambda {
       override def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] = crosswordXmlFiles
 
-      override def createPage(streamName: String)(key: String, xmlData: Elem): Either[Error, Unit] = pageCreator(key, xmlData)
+      override def createPage(streamName: String)(key: String, xmlData: Elem): Try[Unit] = pageCreator(key, xmlData)
 
-      override def upload(url: String)(id: String, data: Array[Byte]): Either[Throwable, String] = uploader(id, data)
+      override def upload(url: String)(id: String, data: Array[Byte]): Try[String] = uploader(id, data)
 
       override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
@@ -53,7 +55,7 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Right(crosswordMicroAppResponseXml.toString())
+      uploader = (_, _) => Success(crosswordMicroAppResponseXml.toString())
     )
 
     fakeLambda.handleRequest(null, null)
@@ -66,10 +68,11 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Right(<invalid-xml/>.toString())
+      uploader = (_, _) => Success(<invalid-xml/>.toString())
     )
 
-    fakeLambda.handleRequest(null, null)
+    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
+    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
@@ -79,10 +82,11 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Right("not xml at all is it?")
+      uploader = (_, _) => Success("not xml at all is it?")
     )
 
-    fakeLambda.handleRequest(null, null)
+    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
+    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
@@ -92,10 +96,11 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Left(new Error("Failed to upload crossword")),
+      uploader = (_, _) => Failure(new Error("Failed to upload crossword")),
     )
 
-    fakeLambda.handleRequest(null, null)
+    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
+    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
@@ -105,11 +110,12 @@ class LambdaTest extends AnyFlatSpec with Matchers {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Right(crosswordMicroAppResponseXml.toString()),
-      pageCreator = (_, _) => Left(new Error("Failed to create page in composer"))
+      uploader = (_, _) => Success(crosswordMicroAppResponseXml.toString()),
+      pageCreator = (_, _) => Failure(new Error("Failed to create page in composer"))
     )
 
-    fakeLambda.handleRequest(null, null)
+    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
+    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
