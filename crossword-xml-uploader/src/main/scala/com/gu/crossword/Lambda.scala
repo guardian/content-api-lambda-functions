@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.gu.crossword.crosswords._
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 trait CrosswordUploaderLambda
   extends RequestHandler[JMap[String, Object], Unit]
@@ -24,6 +24,25 @@ trait CrosswordUploaderLambda
     uploadResult match {
       case Success(_) => Right(crosswordXmlFile.key)
       case Failure(error) => Left((crosswordXmlFile.key, error))
+    }
+  }
+
+  // Upload to crosswordv2 service - do NOT createPage
+  // This should be removed once the crosswordv2 service is ready to be used
+  // Wrapping with Try as we must fail safe and not stop the lambda from running if this fails
+  private def doV2Upload(url: String, crosswordXmlFile: CrosswordXmlFile): Unit = Try {
+    println(s"Attempting to dual upload crossword ${crosswordXmlFile.key} to crosswordv2")
+    val v2Result = for {
+      rawXml <- uploadCrossword(url)(crosswordXmlFile)
+      _ <- XmlProcessor.process(rawXml)
+    } yield ()
+
+    v2Result match {
+      case Success(_) =>
+        println(s"Successfully dual uploaded crossword ${crosswordXmlFile.key} to crosswordv2")
+      case Failure(error) => println(
+        s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${error.getMessage}"
+      )
     }
   }
 
@@ -56,6 +75,9 @@ trait CrosswordUploaderLambda
     }
 
     println(s"The uploading of crossword xml files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
+
+    // Dual upload to crosswordv2 service
+    crosswordXmlFiles.map(doV2Upload(config.crosswordV2Url, _))
 
     // We want to fail the lambda if any of the uploads failed
     if (failures.size > 0) {

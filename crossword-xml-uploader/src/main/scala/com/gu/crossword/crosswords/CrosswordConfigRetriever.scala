@@ -18,6 +18,10 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
     val config = loadConfig(stage)
 
     val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
+
+    // Fail safe in case crosswordV2Url is not set
+    val crosswordV2Url = Option(config.getProperty("crosswordv2.url")) getOrElse "https://crossword-v2-url"
+
     val composerCrosswordIntegrationStreamName = Option(
       config.getProperty("composerCrosswordIntegration.streamName")).getOrElse(
       sys.error("'composerCrosswordIntegration.streamName' property missing")
@@ -31,6 +35,7 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
 
     CrosswordLambdaConfig(
       crosswordMicroAppUrl,
+      crosswordV2Url,
       composerCrosswordIntegrationStreamName,
       crosswordsBucketName
     )

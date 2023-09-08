@@ -1,14 +1,17 @@
 package com.gu.crossword
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.gu.crossword.crosswords.HttpCrosswordClientOps
 import com.gu.crossword.crosswords.models.{CrosswordLambdaConfig, CrosswordXmlFile}
 import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import okhttp3.mockwebserver.{MockResponse, MockWebServer}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 import scala.xml.{Elem, XML}
+
 
 class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
@@ -43,6 +46,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = "https://crossword-microapp-url",
+        crosswordV2Url = "https://crossword-v2-url",
         composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }
@@ -119,5 +123,39 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
+  }
+
+  it should "not fail if the v2 endpoint fails" in {
+    val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
+    val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
+
+    val expectedResponse = crosswordMicroAppResponseXml.toString()
+
+    val mockHttpServer = new MockWebServer()
+    mockHttpServer.start()
+
+    val baseUrl = mockHttpServer.url("/upload").toString
+    mockHttpServer.enqueue(new MockResponse().setBody(expectedResponse));
+
+    val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
+
+    val fakeLambda = new FakeLambda with HttpCrosswordClientOps {
+      override def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] = List(crosswordXmlFile)
+      override def createPage(streamName: String)(key: String, xmlData: Elem): Try[Unit] = Success(())
+
+      override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
+        crosswordsBucketName = "crosswords-bucket",
+        crosswordMicroAppUrl = baseUrl,
+        crosswordV2Url = "https://crossword-v2-url",
+        composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
+      )
+    }
+
+    fakeLambda.handleRequest(null, null)
+
+    fakeLambda.archiveCalled should be(1)
+    fakeLambda.archiveFailedCalled should be(0)
+
+    mockHttpServer.shutdown()
   }
 }
