@@ -13,4 +13,8 @@ class DateLogicTest extends AnyFlatSpec with Matchers with DateLogic {
     transformDate("30.03.2016 00:00") should be("2016-03-29T23:00:00.000+00:00")
   }
 
+  it should "tolerate leading and trailing whitespace from the passed dateString" in {
+    transformDate("     30.03.2016 00:00    ") should be("2016-03-29T23:00:00.000+00:00")
+  }
+
 }
