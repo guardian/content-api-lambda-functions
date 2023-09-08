@@ -40,9 +40,11 @@ trait CrosswordUploaderLambda
     v2Result match {
       case Success(_) =>
         println(s"Successfully dual uploaded crossword ${crosswordXmlFile.key} to crosswordv2")
-      case Failure(error) => println(
-        s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${error.getMessage}"
-      )
+      case Failure(error) =>
+        println(
+          s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${error.getMessage}"
+        )
+        error.getStackTrace.foreach(println)
     }
   }
 
