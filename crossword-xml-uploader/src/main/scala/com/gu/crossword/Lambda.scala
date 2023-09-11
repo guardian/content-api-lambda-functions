@@ -44,9 +44,9 @@ trait CrosswordUploaderLambda
     } partitionMap(identity)
 
     failures.foreach {
-      case (key, error) =>
-        println(s"Failed to upload crossword ${key} with error: ${error.getMessage}")
-        error.getStackTrace.foreach(println)
+      case (key, e) =>
+        println(s"Failed to upload crossword ${key} with error: ${e.getMessage}")
+        e.printStackTrace()
         archiveFailedCrosswordXMLFile(config.crosswordsBucketName, key)
     }
 
