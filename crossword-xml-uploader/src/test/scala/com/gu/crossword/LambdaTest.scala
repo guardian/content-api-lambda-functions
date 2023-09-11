@@ -46,7 +46,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = "https://crossword-microapp-url",
-        crosswordV2Url = "https://crossword-v2-url",
+        crosswordV2Url = None,
         composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }
@@ -146,7 +146,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getConfig(context: Context): CrosswordLambdaConfig = CrosswordLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = baseUrl,
-        crosswordV2Url = "https://crossword-v2-url",
+        crosswordV2Url = Some("https://crossword-v2-url"),
         composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }

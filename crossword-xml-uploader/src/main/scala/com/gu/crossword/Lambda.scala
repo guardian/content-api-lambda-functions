@@ -42,7 +42,7 @@ trait CrosswordUploaderLambda
         println(s"Successfully dual uploaded crossword ${crosswordXmlFile.key} to crosswordv2")
       case Failure(e) =>
         println(
-          s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${error.getMessage}"
+          s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${e.getMessage}"
         )
         e.printStackTrace()
     }
@@ -78,8 +78,10 @@ trait CrosswordUploaderLambda
 
     println(s"The uploading of crossword xml files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
-    // Dual upload to crosswordv2 service
-    crosswordXmlFiles.map(doV2Upload(config.crosswordV2Url, _))
+    // Dual upload to crosswordv2 service if config present
+    config.crosswordV2Url.map(url =>
+      crosswordXmlFiles.map(doV2Upload(url, _))
+    )
 
     // We want to fail the lambda if any of the uploads failed
     if (failures.size > 0) {
