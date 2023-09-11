@@ -75,7 +75,9 @@ trait CrosswordPdfUploaderLambda
     println(s"The uploading of crossword PDF files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
     // Dual upload to crosswordv2 service
-    crosswordPdfFiles.map(doV2Upload(config.crosswordV2Url, _, config.crosswordPdfPublicFileLocation))
+    config.crosswordV2Url.map(url =>
+      crosswordPdfFiles.map(doV2Upload(url, _, config.crosswordPdfPublicFileLocation))
+    )
 
     // We want to fail the lambda if any of the uploads failed
     if (failures.size > 0) {
