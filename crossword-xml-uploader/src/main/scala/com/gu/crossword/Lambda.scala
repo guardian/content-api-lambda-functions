@@ -91,19 +91,9 @@ trait CrosswordXmlUploaderLambda
 }
 
 class Lambda
-<<<<<<< HEAD
-  extends CrosswordXmlUploaderLambda
-    with KinesisComposerOps
-    with S3CrosswordStore
-    with CrosswordXmlUploader
-    with HttpCrosswordClientOps
-    with S3CrosswordConfigRetriever
-
-=======
     extends CrosswordXmlUploaderLambda
       with KinesisComposerOps
       with S3CrosswordStore
       with CrosswordXmlUploader
       with HttpCrosswordClientOps
       with S3CrosswordConfigRetriever
->>>>>>> fcb63f7 (Update pdf uploader)

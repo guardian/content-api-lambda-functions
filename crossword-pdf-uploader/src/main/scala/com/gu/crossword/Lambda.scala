@@ -83,11 +83,6 @@ trait CrosswordPdfUploaderLambda
       throw new Exception(s"Failures detected when uploading crossword PDF files (${failedKeys})!")
     }
 
-    successes.foreach { key =>
-      println(s"Successfully uploaded crossword PDF: ${key}")
-      archiveProcessedPdfFiles(config.crosswordsBucketName, key)
-    }
-
     println("The uploading of crossword PDF files has finished.")
   }
 }
