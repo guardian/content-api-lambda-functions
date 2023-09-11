@@ -41,7 +41,7 @@ trait CrosswordUploaderLambda
         streamName = config.composerCrosswordIntegrationStreamName,
         crosswordXmlFile = crosswordXmlFile
       )
-    } partitionMap(identity)
+    } partitionMap (identity)
 
     failures.foreach {
       case (key, e) =>
@@ -58,7 +58,7 @@ trait CrosswordUploaderLambda
     println(s"The uploading of crossword xml files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
     // We want to fail the lambda if any of the uploads failed
-    if(failures.size > 0) {
+    if (failures.size > 0) {
       val failedKeys = failures.map(_._1).mkString(", ")
       throw new Exception(s"Failures detected when uploading crossword xml files (${failedKeys})!")
     }
@@ -66,9 +66,9 @@ trait CrosswordUploaderLambda
 }
 
 class Lambda
-    extends CrosswordUploaderLambda
-      with KinesisComposerOps
-      with S3CrosswordStore
-      with CrosswordUploader
-      with HttpCrosswordClientOps
-      with S3CrosswordConfigRetriever
+  extends CrosswordUploaderLambda
+    with KinesisComposerOps
+    with S3CrosswordStore
+    with CrosswordUploader
+    with HttpCrosswordClientOps
+    with S3CrosswordConfigRetriever
