@@ -55,6 +55,12 @@ trait CrosswordPdfUploaderLambda
     }
 
     println(s"The uploading of crossword PDF files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
+
+    // We want to fail the lambda if any of the uploads failed
+    if (failures.size > 0) {
+      val failedKeys = failures.map(_._1).mkString(", ")
+      throw new Error(s"Failures detected when uploading crossword PDF files (${failedKeys})!")
+    }
   }
 }
 
