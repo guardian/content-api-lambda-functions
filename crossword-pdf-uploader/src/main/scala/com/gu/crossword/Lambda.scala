@@ -16,8 +16,9 @@ trait CrosswordPdfUploaderLambda
 
   def doUpload(bucketName: String, fileLocation: String, uploadUrl: String, pdfFile: CrosswordPdfFile): Either[(String, Throwable), String] = {
     val uploadResult = for {
-      location <- uploadPdfCrosswordFile(bucketName, fileLocation, pdfFile)
-      _ <- uploadPdfCrosswordLocation(uploadUrl, pdfFile, location)
+      _ <- uploadPdfCrosswordFile(bucketName, fileLocation, pdfFile)
+      uploadLocation = s"${fileLocation}/${pdfFile.awsKey}"
+      _ <- uploadPdfCrosswordLocation(uploadUrl, pdfFile, uploadLocation)
     } yield ()
 
     uploadResult match {

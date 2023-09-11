@@ -8,17 +8,15 @@ import java.io.ByteArrayInputStream
 import scala.util.Try
 
 trait PublicPdfStore {
-  def uploadPdfCrosswordFile(bucketName: String, fileLocation: String, crosswordPdfFile: CrosswordPdfFile): Try[String]
+  def uploadPdfCrosswordFile(bucketName: String, fileLocation: String, crosswordPdfFile: CrosswordPdfFile): Try[Unit]
 }
 
 trait S3PublicPdfStore extends PublicPdfStore {
-  def uploadPdfCrosswordFile(bucketName: String, fileLocation: String, crosswordPdfFile: CrosswordPdfFile): Try[String] = Try {
+  def uploadPdfCrosswordFile(bucketName: String, fileLocation: String, crosswordPdfFile: CrosswordPdfFile): Try[Unit] = Try {
     val is = new ByteArrayInputStream(crosswordPdfFile.file)
     val metadata = objectMetadata(crosswordPdfFile.file.size)
 
     s3Client.putObject(bucketName, crosswordPdfFile.awsKey, is, metadata)
-
-    s"${fileLocation}/${crosswordPdfFile.awsKey}"
   }
 
   private def objectMetadata(length: Int): ObjectMetadata = {
