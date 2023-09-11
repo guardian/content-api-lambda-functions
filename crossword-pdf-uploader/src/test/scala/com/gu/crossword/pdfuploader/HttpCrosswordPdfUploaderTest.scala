@@ -6,6 +6,7 @@ import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.net.URLEncoder
 import scala.util.Success
 
 class HttpCrosswordPdfUploaderTest extends AnyFlatSpec with Matchers with TryValues {
@@ -32,6 +33,20 @@ class HttpCrosswordPdfUploaderTest extends AnyFlatSpec with Matchers with TryVal
       location = "https://crosswords"
     )
     result shouldBe a[Success[_]]
+
+    val request = mockHttpServer.takeRequest();
+    request.getPath should be("/pdf")
+    request.getMethod should be("POST")
+    request.getHeader("Content-Type") should be("application/x-www-form-urlencoded")
+
+    val expectedPdfBody = URLEncoder.encode("https://crosswords", "UTF-8")
+    request.getBody.readUtf8() should be(
+      s"type=${crosswordPdfFile.`type`}&" +
+      s"year=${crosswordPdfFile.year}&" +
+      s"month=${crosswordPdfFile.month}&" +
+      s"day=${crosswordPdfFile.day}&" +
+      s"pdf=${expectedPdfBody}"
+    )
 
     mockHttpServer.shutdown()
   }
