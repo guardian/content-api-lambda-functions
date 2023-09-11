@@ -44,9 +44,9 @@ trait CrosswordPdfUploaderLambda
     } partitionMap(identity)
 
     failures.foreach {
-      case (key, error) =>
-        println(s"Failed to upload crossword PDF ${key} with error: ${error.getMessage}")
-        error.getStackTrace.foreach(println)
+      case (key, e) =>
+        println(s"Failed to upload crossword PDF ${key} with error: ${e.getMessage}")
+        e.printStackTrace()
         archiveFailedPdfFiles(config.crosswordsBucketName, key)
     }
 
