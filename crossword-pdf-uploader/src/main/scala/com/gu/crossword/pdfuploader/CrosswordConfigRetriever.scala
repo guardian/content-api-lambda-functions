@@ -43,7 +43,15 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
     val configFileKey = s"crossword-pdf-uploader/$stage/config.properties"
     val configInputStream = s3Client.getObject("crossword-uploader-config", configFileKey).getObjectContent
     val configFile: Properties = new Properties()
-    Try(configFile.load(configInputStream)) orElse sys.error("Could not load config file from s3. This lambda will not run.")
+
+    try {
+      configFile.load(configInputStream)
+    } catch {
+      case e: Exception =>
+        println(s"Failed to load config file from s3. This lambda will not run. Error: ${e.getMessage}")
+        sys.exit(1)
+    }
+
     configFile
   }
 }
