@@ -60,7 +60,7 @@ trait CrosswordUploaderLambda
     // We want to fail the lambda if any of the uploads failed
     if(failures.size > 0) {
       val failedKeys = failures.map(_._1).mkString(", ")
-      throw new Error(s"Failures detected when uploading crossword xml files (${failedKeys})!")
+      throw new Exception(s"Failures detected when uploading crossword xml files (${failedKeys})!")
     }
   }
 }

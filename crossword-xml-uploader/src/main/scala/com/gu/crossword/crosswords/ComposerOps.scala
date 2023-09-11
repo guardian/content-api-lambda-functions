@@ -23,7 +23,7 @@ trait KinesisComposerOps extends ComposerOps {
       .withRecords(record)
 
     if (kinesisClient.putRecords(request).getFailedRecordCount > 0) {
-      throw new Error(
+      throw new Exception(
         s"Crossword page creation request to Composer for crossword ${key} failed."
       )
     }
