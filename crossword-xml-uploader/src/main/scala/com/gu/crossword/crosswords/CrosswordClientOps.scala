@@ -23,7 +23,7 @@ trait HttpCrosswordClientOps extends CrosswordClientOps {
 
     if(!response.isSuccessful) {
       response.body.close()
-      throw new Exception()(
+      throw new Exception(
         s"Crossword upload failed for crossword: $id, got response code: ${response.code()}"
       )
     } else {
