@@ -9,35 +9,39 @@ import java.io.ByteArrayOutputStream
 import scala.jdk.CollectionConverters._
 
 trait CrosswordPdfStore {
-  def getCrosswordPdfFiles(): List[CrosswordPdfFile]
+  def getCrosswordPdfFiles(bucketName: String): List[CrosswordPdfFile]
   def archiveProcessedPdfFiles(bucketName: String, key: String): Unit
   def archiveFailedPdfFiles(bucketName: String, key: String): Unit
 }
 
 trait S3CrosswordPdfStore extends CrosswordPdfStore {
 
-  def getCrosswordPdfFiles(): List[CrosswordPdfFile] = {
+  def getCrosswordPdfFiles(bucketName: String): List[CrosswordPdfFile] = {
     for {
-      key <- getCrosswordKeys
+      key <- getCrosswordKeys(bucketName)
       crosswordPdfFileName <- CrosswordPdfFileName(key)
       if !isFutureCrossword(crosswordPdfFileName)
-    } yield CrosswordPdfFile(crosswordPdfFileName.fileName, crosswordPdfFileName, getObject(key))
+    } yield CrosswordPdfFile(
+      awsKey = crosswordPdfFileName.fileName,
+      filename = crosswordPdfFileName,
+      file = getObject(bucketName, key)
+    )
   }
 
-  private def getObject(key: String): Array[Byte] = {
-    val obj: S3Object = s3Client.getObject(processingBucketName, key)
+  private def getObject(bucketName: String, key: String): Array[Byte] = {
+    val obj: S3Object = s3Client.getObject(bucketName, key)
     download(obj)
   }
 
-  private def getCrosswordPdfObjectSummaries: List[S3ObjectSummary] = {
-    s3Client.listObjects(processingBucketName).getObjectSummaries.asScala.toList
+  private def getCrosswordPdfObjectSummaries(bucketName: String): List[S3ObjectSummary] = {
+    s3Client.listObjects(bucketName).getObjectSummaries.asScala.toList
       .collect { case os if os.getKey.endsWith(".pdf") => os }
   }
 
-  private def getCrosswordKeys: List[String] = {
+  private def getCrosswordKeys(bucketName: String): List[String] = {
 
     /* Sort crosswords by name */
-    val groupedSummaries = getCrosswordPdfObjectSummaries.groupBy(os => {
+    val groupedSummaries = getCrosswordPdfObjectSummaries(bucketName).groupBy(os => {
       val nameParts = os.getKey.split("\\.").toList
       if (nameParts.length >= 3) {
         List(nameParts(0), nameParts(1), nameParts(2)).mkString(".")
@@ -74,7 +78,7 @@ trait S3CrosswordPdfStore extends CrosswordPdfStore {
 
     println(s"Archiving all versions of $key")
     val fileName = key.dropRight(4) // remove .pdf file extension
-    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
+    val keysToArchive = getCrosswordPdfObjectSummaries(bucketName).filter(_.getKey.startsWith(fileName)).map(_.getKey)
     keysToArchive.foreach(key => moveFileToS3Bucket(bucketName, archiveBucketName, key))
   }
 
@@ -83,7 +87,11 @@ trait S3CrosswordPdfStore extends CrosswordPdfStore {
 
     println(s"Moving all versions of $key to failed bucket")
     val fileName = key.dropRight(4) // remove .pdf file extension
-    val keysToArchive = getCrosswordPdfObjectSummaries.filter(_.getKey.startsWith(fileName)).map(_.getKey)
-    keysToArchive.foreach(key => moveFileToS3Bucket(bucketName, processingFailedBucketName, key))
+    val keysToArchive = getCrosswordPdfObjectSummaries(bucketName)
+      .filter(_.getKey.startsWith(fileName))
+      .map(_.getKey)
+    keysToArchive.foreach(key =>
+      moveFileToS3Bucket(bucketName, processingFailedBucketName, key)
+    )
   }
 }

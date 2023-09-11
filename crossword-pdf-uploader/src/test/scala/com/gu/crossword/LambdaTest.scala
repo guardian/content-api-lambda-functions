@@ -34,9 +34,9 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
                        crosswordPdfFiles: List[CrosswordPdfFile] = List.empty,
                        uploadCrosswordFile: UploadCrosswordFile = (_, _, _) => Success(""),
                        uploadCrosswordLocation: UploadCrosswordLocation = (_, _, _) => Success(Unit),
-                     ) = {
+                     ): FakeLambda = {
     new FakeLambda {
-      override def getCrosswordPdfFiles(): List[CrosswordPdfFile] = crosswordPdfFiles
+      override def getCrosswordPdfFiles(bucketName: String): List[CrosswordPdfFile] = crosswordPdfFiles
 
       override def getConfig(context: Context): CrosswordPdfLambdaConfig = CrosswordPdfLambdaConfig(
         crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",

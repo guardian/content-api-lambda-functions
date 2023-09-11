@@ -27,11 +27,11 @@ trait CrosswordPdfUploaderLambda
   }
 
   def handleRequest(event: JMap[String, Object], context: Context): Unit = {
-    implicit val config = getConfig(context)
+    val config = getConfig(context)
 
     println("The uploading of crossword PDF files has started.")
-
-    val crosswordPdfFiles = getCrosswordPdfFiles()
+    val crosswordPdfFiles = getCrosswordPdfFiles(config.crosswordsBucketName)
+    println(s"Found ${crosswordPdfFiles.size} crossword PDF file(s) to process")
 
     val (failures, successes) = crosswordPdfFiles.map { pdfFile =>
       doUpload(
@@ -54,7 +54,7 @@ trait CrosswordPdfUploaderLambda
       archiveProcessedPdfFiles(config.crosswordsBucketName, key)
     }
 
-    println("The uploading of crossword PDF files has finished.")
+    println(s"The uploading of crossword PDF files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
   }
 }
 
