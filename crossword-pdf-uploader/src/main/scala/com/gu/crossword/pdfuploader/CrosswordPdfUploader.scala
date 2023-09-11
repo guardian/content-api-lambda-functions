@@ -29,14 +29,14 @@ trait HttpCrosswordPdfUploader extends CrosswordPdfUploader {
 
     // Fail if the crossword microapp returns a 404, as this means the crossword XML file has not been uploaded yet.
     if (response.code() == HttpStatus.SC_NOT_FOUND) {
-      throw new RuntimeException(
+      throw new Exception(
         s"Could not find crossword for PDF: ${crosswordPdfFile.awsKey}!\n" +
           "Ensure the relevant crossword XML file has been uploaded first.")
     }
 
     // Fail for any non-200 response code.
     if(!response.isSuccessful) {
-      throw new RuntimeException(
+      throw new Exception(
         s"Crossword PDF upload failed: ${crosswordPdfFile.filename}, got response code: ${response.code()}"
       )
     }
