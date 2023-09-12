@@ -6,13 +6,14 @@ import scala.xml.XML
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class XmlProcessorTest extends AnyFlatSpec with Matchers with XmlProcessor {
+class XmlProcessorTest extends AnyFlatSpec with Matchers {
+  import XmlProcessor._
 
   behavior of "XmlProcessorTest - should correctly transform crossword microapp xml to flex integration xml."
 
   val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
   val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
-  val processedXml = process(crosswordMicroAppResponseXml)
+  val processedXml = process(crosswordMicroAppResponseXml).getOrElse(throw new Exception("Failed to process xml."))
 
   it should "process the notes correctly." in {
     (processedXml \\ "crossword").head.attribute("notes").get.text should be("Notes for crossword article")

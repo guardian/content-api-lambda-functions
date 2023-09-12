@@ -1,27 +1,74 @@
 package com.gu.crossword
 
-import java.util.{ Map => JMap }
-import com.amazonaws.services.lambda.runtime.{ RequestHandler, Context }
-import com.gu.crossword.crosswords.{ CrosswordStore, CrosswordUploader }
+import java.util.{Map => JMap}
+import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
+import com.gu.crossword.crosswords._
+import com.gu.crossword.crosswords.models.CrosswordXmlFile
 
-class Lambda
-    extends RequestHandler[JMap[String, Object], Unit]
-    with CrosswordUploader
-    with CrosswordStore {
+import scala.util.{Failure, Success}
 
-  override def handleRequest(event: JMap[String, Object], context: Context): Unit = {
+trait CrosswordUploaderLambda
+  extends RequestHandler[JMap[String, Object], Unit]
+    with ComposerOps
+    with CrosswordStore
+    with CrosswordConfigRetriever
+    with CrosswordUploader {
 
-    implicit val config = new Config(context)
+  private def doUpload(url: String, streamName: String, crosswordXmlFile: CrosswordXmlFile): Either[(String, Throwable), String] = {
+    val uploadResult = for {
+      rawXml <- uploadCrossword(url)(crosswordXmlFile)
+      crosswordXml <- XmlProcessor.process(rawXml)
+      _ <- createPage(streamName)(crosswordXmlFile.key, crosswordXml)
+    } yield ()
+
+    uploadResult match {
+      case Success(_) => Right(crosswordXmlFile.key)
+      case Failure(error) => Left((crosswordXmlFile.key, error))
+    }
+  }
+
+  def handleRequest(event: JMap[String, Object], context: Context): Unit = {
+    val config = getConfig(context)
 
     println("The uploading of crossword xml files has started.")
 
-    for {
-      crosswordXmlFile <- getCrosswordXmlFiles(config)
-    } yield {
-      uploadCrossword(crosswordXmlFile)
+    val crosswordXmlFiles = getCrosswordXmlFiles(config.crosswordsBucketName)
+    println(s"Found ${crosswordXmlFiles.size} crossword file(s) to process")
+
+    val (failures, successes) = crosswordXmlFiles.map { crosswordXmlFile =>
+      doUpload(
+        url = config.crosswordMicroAppUrl,
+        streamName = config.composerCrosswordIntegrationStreamName,
+        crosswordXmlFile = crosswordXmlFile
+      )
+    } partitionMap (identity)
+
+    failures.foreach {
+      case (key, e) =>
+        println(s"Failed to upload crossword ${key} with error: ${e.getMessage}")
+        e.printStackTrace()
+        archiveFailedCrosswordXMLFile(config.crosswordsBucketName, key)
     }
 
-    println("The uploading of crossword xml files has finished.")
-  }
+    successes.foreach { key =>
+      println(s"Successfully uploaded crossword ${key}")
+      archiveCrosswordXMLFile(config.crosswordsBucketName, key)
+    }
 
+    println(s"The uploading of crossword xml files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
+
+    // We want to fail the lambda if any of the uploads failed
+    if (failures.size > 0) {
+      val failedKeys = failures.map(_._1).mkString(", ")
+      throw new Exception(s"Failures detected when uploading crossword xml files (${failedKeys})!")
+    }
+  }
 }
+
+class Lambda
+  extends CrosswordUploaderLambda
+    with KinesisComposerOps
+    with S3CrosswordStore
+    with CrosswordUploader
+    with HttpCrosswordClientOps
+    with S3CrosswordConfigRetriever

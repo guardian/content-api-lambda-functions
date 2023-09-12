@@ -1,37 +1,15 @@
 package com.gu.crossword.crosswords
 
-import com.gu.crossword.Config
-import com.gu.crossword.crosswords.models.CrosswordXmlFile
-import com.gu.crossword.services.Http.httpClient
-import scala.xml.XML
-import okhttp3._
+import com.gu.crossword.crosswords.models._
+import scala.xml.{Elem, XML}
 
-trait CrosswordUploader extends ComposerCrosswordIntegration with XmlProcessor {
+import scala.util.Try
 
-  def uploadCrossword(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config): Unit = {
-    val request = buildRequest(crosswordXmlFile)
-    val response: Response = httpClient.newCall(request).execute()
-
-    val responseBody = response.body.string
-    if (response.isSuccessful) {
-      val crosswordXmlToCreatePage = process(XML.loadString(responseBody))
-      println(s"creating page for crossword ${crosswordXmlFile.key} in flex.")
-      createPage(crosswordXmlFile, crosswordXmlToCreatePage)
-    } else {
-      println(s"Crossword upload failed for crossword: ${crosswordXmlFile.key}")
-      println(s"Returned error is $responseBody")
-      archiveFailedCrosswordXMLFile(config, crosswordXmlFile.key)
-    }
+trait CrosswordUploader extends CrosswordClientOps {
+  def uploadCrossword(crosswordMicroAppUrl: String)(crosswordXmlFile: CrosswordXmlFile): Try[Elem] = {
+    for {
+      responseBody <- upload(crosswordMicroAppUrl)(crosswordXmlFile.key, crosswordXmlFile.file)
+      rawXml <- Try(XML.loadString(responseBody))
+    } yield rawXml
   }
-
-  private def buildRequest(crosswordXmlFile: CrosswordXmlFile)(implicit config: Config) = {
-    val requestBody: RequestBody = new MultipartBody.Builder()
-      .setType(MultipartBody.FORM)
-      .addFormDataPart("result_format", "xml")
-      .addFormDataPart("xml", crosswordXmlFile.key, RequestBody.create(MediaType.parse("application/xml"), crosswordXmlFile.file))
-      .build()
-
-    new Request.Builder().url(config.crosswordMicroAppUrl).post(requestBody).build()
-  }
-
 }

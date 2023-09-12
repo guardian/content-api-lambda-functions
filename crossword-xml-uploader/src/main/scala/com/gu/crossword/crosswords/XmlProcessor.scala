@@ -2,7 +2,9 @@ package com.gu.crossword.crosswords
 
 import scala.xml._
 import org.joda.time.format.DateTimeFormat
-import org.joda.time.{ DateTimeZone, DateTime }
+import org.joda.time.{DateTime, DateTimeZone}
+
+import scala.util.Try
 
 trait DateLogic {
 
@@ -14,9 +16,8 @@ trait DateLogic {
 
 }
 
-trait XmlProcessor extends DateLogic {
-
-  def process(crosswordXml: Elem): Elem = {
+object XmlProcessor extends DateLogic {
+  def process(crosswordXml: Elem): Try[Elem] = Try {
 
     implicit val xmlToProcess: Elem = crosswordXml
 

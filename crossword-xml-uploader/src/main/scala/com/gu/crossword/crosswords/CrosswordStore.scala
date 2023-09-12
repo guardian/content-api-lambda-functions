@@ -5,25 +5,28 @@ import scala.jdk.CollectionConverters._
 
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
-import com.gu.crossword.Config
 import com.gu.crossword.crosswords.models.CrosswordXmlFile
-import com.gu.crossword.services.S3.s3Client
-
+import com.gu.crossword.services.AWS.s3Client
 
 trait CrosswordStore {
+  def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile]
+  def archiveCrosswordXMLFile(bucketName: String, awsKey: String): Unit
+  def archiveFailedCrosswordXMLFile(bucketName: String, awsKey: String): Unit
+}
 
-  def getCrosswordXmlFiles(config: Config): List[CrosswordXmlFile] = {
+trait S3CrosswordStore extends CrosswordStore {
+  def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] =
     s3Client
-      .listObjects(config.crosswordsBucketName)
+      .listObjects(crosswordsBucketName)
       .getObjectSummaries
       .asScala
       .toList
       .filter(_.getKey.endsWith(".xml"))
-      .map(os => CrosswordXmlFile(os.getKey, getCrossword(os.getKey, config)))
-  }
+      .map(os => CrosswordXmlFile(os.getKey, getCrossword(crosswordsBucketName, os.getKey)))
 
-  private def getCrossword(key: String, config: Config): Array[Byte] = {
-    val obj: S3Object = s3Client.getObject(config.crosswordsBucketName, key)
+
+  private def getCrossword(bucketName: String, key: String): Array[Byte] = {
+    val obj: S3Object = s3Client.getObject(bucketName, key)
     download(obj)
   }
 
@@ -33,18 +36,19 @@ trait CrosswordStore {
     out.toByteArray
   }
 
-  def archiveCrosswordXMLFile(config: Config, awsKey: String): Unit = {
+  def archiveCrosswordXMLFile(bucketName: String, awsKey: String): Unit = {
     val archiveBucketName = "crossword-processed-files"
     println(s"Moving $awsKey to bucket $archiveBucketName")
-    s3Client.copyObject(config.crosswordsBucketName, awsKey, archiveBucketName, awsKey)
-    s3Client.deleteObject(config.crosswordsBucketName, awsKey)
+    s3Client.copyObject(bucketName, awsKey, archiveBucketName, awsKey)
+    s3Client.deleteObject(bucketName, awsKey)
   }
 
-  def archiveFailedCrosswordXMLFile(config: Config, awsKey: String): Unit = {
+  def archiveFailedCrosswordXMLFile(bucketName: String, awsKey: String): Unit = {
     val processingFailedBucketName = "crossword-failed-files"
-    s3Client.copyObject(config.crosswordsBucketName, awsKey, processingFailedBucketName, awsKey)
+    println(s"Moving failed $awsKey to bucket $processingFailedBucketName")
+    s3Client.copyObject(bucketName, awsKey, processingFailedBucketName, awsKey)
     if(s3Client.doesObjectExist(processingFailedBucketName, awsKey)) {
-      s3Client.deleteObject(config.crosswordsBucketName, awsKey)
+      s3Client.deleteObject(bucketName, awsKey)
     }
   }
 }
