@@ -12,7 +12,6 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
 
-
 class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
   type PageCreator = (String, Elem) => Try[Unit]
@@ -44,7 +43,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
         crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",
         crosswordPdfPublicFileLocation = "crossword-pdf-public-file-location",
         crosswordMicroAppUrl = "https://crossword-microapp-url",
-        crosswordV2Url = "https://crossword-v2-url",
+        crosswordV2Url = None,
         crosswordsBucketName = "crosswords-bucket-name",
       )
 
@@ -74,8 +73,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
     fakeLambda.handleRequest(null, null)
 
     // Check location is constructed as expected
-    // TODO: This makes 2 calls when dual-running, when we have migrated to v2 we should only make 1 call
-    uploadCrosswordLocationCalled.size should be(2)
+    uploadCrosswordLocationCalled.size should be(1)
     uploadCrosswordLocationCalled map {
       case (_, location, _) =>
         location should be("crossword-pdf-public-file-location/gdn.cryptic.20230418.pdf")
@@ -140,7 +138,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
         crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",
         crosswordPdfPublicFileLocation = "crossword-pdf-public-file-location",
         crosswordMicroAppUrl = baseUrl,
-        crosswordV2Url = "https://crossword-v2-url",
+        crosswordV2Url = Some("https://crossword-v2-url"),
         crosswordsBucketName = "crosswords-bucket-name",
       )
     }
