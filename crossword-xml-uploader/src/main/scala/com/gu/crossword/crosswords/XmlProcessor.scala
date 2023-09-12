@@ -11,7 +11,7 @@ trait DateLogic {
   def transformDate(dateString: String): String = {
     val inputFormat = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm").withZone(DateTimeZone.forID("Europe/London"))
     val outputFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withZone(DateTimeZone.forID("UTC"))
-    DateTime.parse(dateString, inputFormat).toString(outputFormat)
+    DateTime.parse(dateString.trim, inputFormat).toString(outputFormat)
   }
 
 }

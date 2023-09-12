@@ -41,5 +41,4 @@ class Lambda
       if (config.isProd) archiveFailedPdfFiles(crosswordPdfFile.awsKey)
     }
   }
-
 }

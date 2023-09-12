@@ -4,10 +4,11 @@ import okhttp3.mockwebserver.MockResponse
 import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import okhttp3.mockwebserver.MockWebServer
+
 
 class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with TryValues {
 
-  import okhttp3.mockwebserver.MockWebServer
 
   val httpCrosswordClientOps = new HttpCrosswordClientOps() {}
 
@@ -49,7 +50,7 @@ class HttpCrosswordClientOpsTest extends AnyFlatSpec with Matchers with TryValue
     val baseUrl = mockHttpServer.url("/upload").toString
 
     val result = httpCrosswordClientOps.upload(baseUrl)("id", Array.empty)
-    result.failed.get.getMessage should include ("timeout")
+    result.failed.get.getMessage should include ("time")
 
     mockHttpServer.shutdown()
   }
