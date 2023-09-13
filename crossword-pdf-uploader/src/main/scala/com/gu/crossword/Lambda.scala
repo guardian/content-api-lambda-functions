@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.gu.crossword.pdfuploader.models.CrosswordPdfFile
 import com.gu.crossword.pdfuploader.{CrosswordConfigRetriever, CrosswordPdfStore, CrosswordPdfUploader, HttpCrosswordPdfUploader, PublicPdfStore, S3CrosswordConfigRetriever, S3CrosswordPdfStore, S3PublicPdfStore}
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 trait CrosswordPdfUploaderLambda
   extends RequestHandler[JMap[String, Object], Unit]
@@ -27,6 +27,23 @@ trait CrosswordPdfUploaderLambda
     }
   }
 
+  private def doV2Upload(uploadV2Url: String, pdfFile: CrosswordPdfFile, fileLocation: String): Unit = Try {
+    val uploadLocation = s"${fileLocation}/${pdfFile.awsKey}"
+    val v2Result = for {
+      _ <- uploadPdfCrosswordLocation(uploadV2Url, pdfFile, uploadLocation)
+    } yield ()
+
+    v2Result match {
+      case Success(_) =>
+        println(s"Successfully dual uploaded crossword PDF ${pdfFile.awsKey} to crosswordv2")
+      case Failure(error) =>
+        println(
+          s"Failed to dual upload crossword PDF ${pdfFile.awsKey} to crosswordv2 with error: ${error.getMessage}"
+        )
+        error.getStackTrace.foreach(println)
+    }
+  }
+
   def handleRequest(event: JMap[String, Object], context: Context): Unit = {
     val config = getConfig(context)
 
@@ -41,7 +58,7 @@ trait CrosswordPdfUploaderLambda
         uploadUrl = config.crosswordMicroAppUrl,
         pdfFile = pdfFile
       )
-    } partitionMap(identity)
+    } partitionMap (identity)
 
     failures.foreach {
       case (key, e) =>
@@ -57,11 +74,18 @@ trait CrosswordPdfUploaderLambda
 
     println(s"The uploading of crossword PDF files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
+    // Dual upload to crosswordv2 service
+    config.crosswordV2Url.map(url =>
+      crosswordPdfFiles.map(doV2Upload(url, _, config.crosswordPdfPublicFileLocation))
+    )
+
     // We want to fail the lambda if any of the uploads failed
     if (failures.size > 0) {
       val failedKeys = failures.map(_._1).mkString(", ")
       throw new Exception(s"Failures detected when uploading crossword PDF files (${failedKeys})!")
     }
+
+    println("The uploading of crossword PDF files has finished.")
   }
 }
 

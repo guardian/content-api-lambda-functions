@@ -91,10 +91,9 @@ trait CrosswordXmlUploaderLambda
 }
 
 class Lambda
-  extends CrosswordXmlUploaderLambda
-    with KinesisComposerOps
-    with S3CrosswordStore
-    with CrosswordXmlUploader
-    with HttpCrosswordClientOps
-    with S3CrosswordConfigRetriever
-
+    extends CrosswordXmlUploaderLambda
+      with KinesisComposerOps
+      with S3CrosswordStore
+      with CrosswordXmlUploader
+      with HttpCrosswordClientOps
+      with S3CrosswordConfigRetriever

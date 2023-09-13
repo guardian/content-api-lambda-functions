@@ -20,6 +20,10 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
     val config = loadConfig(stage)
 
     val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
+
+    // Fail safe in case crosswordV2Url is not set
+    val crosswordV2Url = Option(config.getProperty("crosswordv2.url"))
+
     val crosswordPdfPublicBucketName = s"crosswords-pdf-public-${stage.toLowerCase}"
     val crosswordPdfPublicFileLocation = if (isProd) s"https://crosswords-static.guim.co.uk" else s"https://s3-eu-west-1.amazonaws.com/$crosswordPdfPublicBucketName"
 
@@ -31,6 +35,7 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
 
     CrosswordPdfLambdaConfig(
       crosswordMicroAppUrl,
+      crosswordV2Url,
       crosswordsBucketName,
       crosswordPdfPublicBucketName,
       crosswordPdfPublicFileLocation
