@@ -1,4 +1,4 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import scala.xml._
 import org.joda.time.format.DateTimeFormat

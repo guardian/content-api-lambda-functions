@@ -1,6 +1,5 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
-import com.gu.crossword.services.Http
 import okhttp3._
 
 import scala.util.Try
@@ -11,6 +10,8 @@ trait CrosswordClientOps {
 }
 
 trait HttpCrosswordClientOps extends CrosswordClientOps {
+  lazy val httpClient: OkHttpClient = new OkHttpClient()
+
   def upload(url: String)(id: String, data: Array[Byte]): Try[String] = Try {
     val requestBody: RequestBody = new MultipartBody.Builder()
       .setType(MultipartBody.FORM)
@@ -19,7 +20,7 @@ trait HttpCrosswordClientOps extends CrosswordClientOps {
       .build()
 
     val request = new Request.Builder().url(url).post(requestBody).build()
-    val response: Response = Http.httpClient.newCall(request).execute()
+    val response: Response = httpClient.newCall(request).execute()
 
     if(!response.isSuccessful) {
       response.body.close()

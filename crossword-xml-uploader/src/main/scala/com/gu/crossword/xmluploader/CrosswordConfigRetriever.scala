@@ -1,18 +1,18 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.crossword.crosswords.models.CrosswordLambdaConfig
 import com.gu.crossword.services.AWS.s3Client
+import com.gu.crossword.xmluploader.models.CrosswordXmlLambdaConfig
 
 import java.util.Properties
 import scala.util.Try
 
 trait CrosswordConfigRetriever {
-  def getConfig(context: Context): CrosswordLambdaConfig
+  def getConfig(context: Context): CrosswordXmlLambdaConfig
 }
 
 trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
-  def getConfig(context: Context): CrosswordLambdaConfig = {
+  def getConfig(context: Context): CrosswordXmlLambdaConfig = {
     val isProd = Try(context.getFunctionName.toLowerCase.contains("-prod")).getOrElse(false)
     val stage = if (isProd) "PROD" else "CODE"
     val config = loadConfig(stage)
@@ -31,7 +31,7 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
       else
         "crossword-files-for-processing-code"
 
-    CrosswordLambdaConfig(
+    CrosswordXmlLambdaConfig(
       crosswordMicroAppUrl,
       crosswordV2Url,
       composerCrosswordIntegrationStreamName,

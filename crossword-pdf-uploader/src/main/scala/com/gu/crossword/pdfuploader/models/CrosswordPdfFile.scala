@@ -1,4 +1,4 @@
-package com.gu.crossword.models
+package com.gu.crossword.pdfuploader.models
 
 import org.joda.time.{ DateTime, DateTimeConstants, DateTimeZone, LocalDate }
 import scala.util.{ Success, Try }
@@ -39,6 +39,5 @@ object CrosswordPdfFileName {
         None
       }
     }
-
   }
 }

@@ -1,12 +1,11 @@
-package com.gu.crossword.crosswords
+package com.gu.crossword.xmluploader
 
 import java.io.ByteArrayOutputStream
 import scala.jdk.CollectionConverters._
-
 import com.amazonaws.services.s3.model.S3Object
 import com.google.common.io.ByteStreams
-import com.gu.crossword.crosswords.models.CrosswordXmlFile
 import com.gu.crossword.services.AWS.s3Client
+import com.gu.crossword.xmluploader.models.CrosswordXmlFile
 
 trait CrosswordStore {
   def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile]
