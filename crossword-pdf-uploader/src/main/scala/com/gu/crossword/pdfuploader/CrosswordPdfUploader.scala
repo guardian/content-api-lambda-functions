@@ -26,6 +26,7 @@ trait HttpCrosswordPdfUploader extends CrosswordPdfUploader {
     val request = new Request.Builder().url(url).post(requestBody).build()
 
     val response = httpClient.newCall(request).execute()
+    response.close()
 
     // Fail if the crossword microapp returns a 404, as this means the crossword XML file has not been uploaded yet.
     if (response.code() == HttpStatus.SC_NOT_FOUND) {
