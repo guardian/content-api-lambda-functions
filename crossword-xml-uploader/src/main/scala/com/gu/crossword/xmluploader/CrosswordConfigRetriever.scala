@@ -17,8 +17,8 @@ trait S3CrosswordConfigRetriever extends CrosswordConfigRetriever {
     val stage = if (isProd) "PROD" else "CODE"
     val config = loadConfig(stage)
 
-    val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url")) getOrElse sys.error("'crosswordmicroapp.url' property missing.")
-    val crosswordV2Url = Option(config.getProperty("crosswordv2.url"))
+    val crosswordMicroAppUrl = Option(config.getProperty("crosswordmicroapp.url"))
+    val crosswordV2Url = Option(config.getProperty("crosswordv2.url")) getOrElse sys.error("'crosswordv2.url' property missing.")
 
     val composerCrosswordIntegrationStreamName = Option(
       config.getProperty("composerCrosswordIntegration.streamName")).getOrElse(

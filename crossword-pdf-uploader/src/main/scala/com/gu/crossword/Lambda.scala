@@ -27,18 +27,21 @@ trait CrosswordPdfUploaderLambda
     }
   }
 
-  private def doV2Upload(uploadV2Url: String, pdfFile: CrosswordPdfFile, fileLocation: String): Unit = Try {
+  // Upload to old crossword service - do NOT createPage
+  // This should be removed once the crosswordv2 service has been running for a while
+  // Wrapping with Try as we must fail safe and not stop the lambda from running if this fails
+  private def doV1Upload(url: String, pdfFile: CrosswordPdfFile, fileLocation: String): Unit = Try {
     val uploadLocation = s"${fileLocation}/${pdfFile.awsKey}"
-    val v2Result = for {
-      _ <- uploadPdfCrosswordLocation(uploadV2Url, pdfFile, uploadLocation)
+    val result = for {
+      _ <- uploadPdfCrosswordLocation(url, pdfFile, uploadLocation)
     } yield ()
 
-    v2Result match {
+    result match {
       case Success(_) =>
-        println(s"Successfully dual uploaded crossword PDF ${pdfFile.awsKey} to crosswordv2")
+        println(s"Successfully dual uploaded crossword PDF ${pdfFile.awsKey} to old crossword service")
       case Failure(error) =>
         println(
-          s"Failed to dual upload crossword PDF ${pdfFile.awsKey} to crosswordv2 with error: ${error.getMessage}"
+          s"Failed to dual upload crossword PDF ${pdfFile.awsKey} to old crossword service with error: ${error.getMessage}"
         )
         error.getStackTrace.foreach(println)
     }
@@ -55,7 +58,7 @@ trait CrosswordPdfUploaderLambda
       doUpload(
         bucketName = config.crosswordPdfPublicBucketName,
         fileLocation = config.crosswordPdfPublicFileLocation,
-        uploadUrl = config.crosswordMicroAppUrl,
+        uploadUrl = config.crosswordV2Url,
         pdfFile = pdfFile
       )
     } partitionMap (identity)
@@ -74,9 +77,9 @@ trait CrosswordPdfUploaderLambda
 
     println(s"The uploading of crossword PDF files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
-    // Dual upload to crosswordv2 service
-    config.crosswordV2Url.map(url =>
-      crosswordPdfFiles.map(doV2Upload(url, _, config.crosswordPdfPublicFileLocation))
+    // Dual upload to old crossword service
+    config.crosswordMicroAppUrl.map(url =>
+      crosswordPdfFiles.map(doV1Upload(url, _, config.crosswordPdfPublicFileLocation))
     )
 
     // We want to fail the lambda if any of the uploads failed

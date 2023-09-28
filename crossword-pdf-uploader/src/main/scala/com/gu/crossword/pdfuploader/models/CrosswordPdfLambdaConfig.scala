@@ -1,8 +1,8 @@
 package com.gu.crossword.pdfuploader.models
 
 case class CrosswordPdfLambdaConfig(
-  crosswordMicroAppUrl: String,
-  crosswordV2Url: Option[String],
+  crosswordMicroAppUrl: Option[String],
+  crosswordV2Url: String,
   crosswordsBucketName: String,
   crosswordPdfPublicBucketName: String,
   crosswordPdfPublicFileLocation: String,

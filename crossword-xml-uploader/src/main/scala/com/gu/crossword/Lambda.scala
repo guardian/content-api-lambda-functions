@@ -26,11 +26,11 @@ trait CrosswordXmlUploaderLambda
     }
   }
 
-  // Upload to crosswordv2 service - do NOT createPage
-  // This should be removed once the crosswordv2 service is ready to be used
+  // Upload to old crossword service - do NOT createPage
+  // This should be removed once the crosswordv2 service has been running for a while
   // Wrapping with Try as we must fail safe and not stop the lambda from running if this fails
-  private def doV2Upload(url: String, crosswordXmlFile: CrosswordXmlFile): Unit = Try {
-    println(s"Attempting to dual upload crossword ${crosswordXmlFile.key} to crosswordv2")
+  private def doV1Upload(url: String, crosswordXmlFile: CrosswordXmlFile): Unit = Try {
+    println(s"Attempting to dual upload crossword ${crosswordXmlFile.key} to old crossword service")
     val v2Result = for {
       rawXml <- uploadCrossword(url)(crosswordXmlFile)
       _ <- XmlProcessor.process(rawXml)
@@ -38,10 +38,10 @@ trait CrosswordXmlUploaderLambda
 
     v2Result match {
       case Success(_) =>
-        println(s"Successfully dual uploaded crossword ${crosswordXmlFile.key} to crosswordv2")
+        println(s"Successfully dual uploaded crossword ${crosswordXmlFile.key} to old crossword service")
       case Failure(e) =>
         println(
-          s"Failed to dual upload crossword ${crosswordXmlFile.key} to crosswordv2 with error: ${e.getMessage}"
+          s"Failed to dual upload crossword ${crosswordXmlFile.key} to old crossword service with error: ${e.getMessage}"
         )
         e.printStackTrace()
     }
@@ -57,7 +57,7 @@ trait CrosswordXmlUploaderLambda
 
     val (failures, successes) = crosswordXmlFiles.map { crosswordXmlFile =>
       doUpload(
-        url = config.crosswordMicroAppUrl,
+        url = config.crosswordV2Url,
         streamName = config.composerCrosswordIntegrationStreamName,
         crosswordXmlFile = crosswordXmlFile
       )
@@ -77,9 +77,9 @@ trait CrosswordXmlUploaderLambda
 
     println(s"The uploading of crossword xml files has finished, ${successes.size} succeeded, ${failures.size} failed.}")
 
-    // Dual upload to crosswordv2 service if config present
-    config.crosswordV2Url.map(url =>
-      crosswordXmlFiles.map(doV2Upload(url, _))
+    // Dual upload to old crossword service if config present
+    config.crosswordMicroAppUrl.map(url =>
+      crosswordXmlFiles.map(doV1Upload(url, _))
     )
 
     // We want to fail the lambda if any of the uploads failed
