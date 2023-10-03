@@ -1,8 +1,8 @@
 package com.gu.crossword.xmluploader.models
 
 case class CrosswordXmlLambdaConfig(
-                                  crosswordMicroAppUrl: String,
-                                  crosswordV2Url: Option[String],
+                                  crosswordMicroAppUrl: Option[String],
+                                  crosswordV2Url: String,
                                   composerCrosswordIntegrationStreamName: String,
                                   crosswordsBucketName: String
                                 )

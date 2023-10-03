@@ -45,8 +45,8 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
       override def getConfig(context: Context): CrosswordXmlLambdaConfig = CrosswordXmlLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
-        crosswordMicroAppUrl = "https://crossword-microapp-url",
-        crosswordV2Url = None,
+        crosswordMicroAppUrl = None,
+        crosswordV2Url = "https://crossword-microapp-url",
         composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }
@@ -125,7 +125,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
     fakeLambda.archiveFailedCalled should be(1)
   }
 
-  it should "not fail if the v2 endpoint fails" in {
+  it should "not fail if the old crossword service endpoint fails" in {
     val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
     val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
 
@@ -145,8 +145,8 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
       override def getConfig(context: Context): CrosswordXmlLambdaConfig = CrosswordXmlLambdaConfig(
         crosswordsBucketName = "crosswords-bucket",
-        crosswordMicroAppUrl = baseUrl,
-        crosswordV2Url = Some("https://crossword-v2-url"),
+        crosswordMicroAppUrl = Some("https://crossword-microapp-url"),
+        crosswordV2Url = baseUrl,
         composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }

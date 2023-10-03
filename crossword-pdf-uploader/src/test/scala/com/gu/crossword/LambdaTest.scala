@@ -42,8 +42,8 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getConfig(context: Context): CrosswordPdfLambdaConfig = CrosswordPdfLambdaConfig(
         crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",
         crosswordPdfPublicFileLocation = "crossword-pdf-public-file-location",
-        crosswordMicroAppUrl = "https://crossword-microapp-url",
-        crosswordV2Url = None,
+        crosswordMicroAppUrl = None,
+        crosswordV2Url = "https://crossword-microapp-url",
         crosswordsBucketName = "crosswords-bucket-name",
       )
 
@@ -119,7 +119,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
     fakeLambda.archiveFailedCalled should be(1)
   }
 
-  it should "not fail if the v2 endpoint fails" in {
+  it should "not fail if the old crossword service endpoint fails" in {
     val expectedResponse = "<response />"
     val mockHttpServer = new MockWebServer()
     mockHttpServer.start()
@@ -137,8 +137,8 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
       override def getConfig(context: Context): CrosswordPdfLambdaConfig = CrosswordPdfLambdaConfig(
         crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",
         crosswordPdfPublicFileLocation = "crossword-pdf-public-file-location",
-        crosswordMicroAppUrl = baseUrl,
-        crosswordV2Url = Some("https://crossword-v2-url"),
+        crosswordMicroAppUrl = Some("https://crossword-microapp-url"),
+        crosswordV2Url = baseUrl,
         crosswordsBucketName = "crosswords-bucket-name",
       )
     }
