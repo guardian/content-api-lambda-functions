@@ -1,12 +1,10 @@
 package com.gu.crossword
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.crossword.xmluploader.HttpCrosswordClientOps
 import com.gu.crossword.xmluploader.models.{CrosswordXmlLambdaConfig, CrosswordXmlFile}
 import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import okhttp3.mockwebserver.{MockResponse, MockWebServer}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -47,7 +45,6 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
         crosswordsBucketName = "crosswords-bucket",
         crosswordMicroAppUrl = None,
         crosswordV2Url = "https://crossword-microapp-url",
-        composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
       )
     }
   }
@@ -68,21 +65,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
     fakeLambda.archiveFailedCalled should be(0)
   }
 
-  it should "archive as failure a processed crossword with xml that XmlProcessor fails to parse" in {
-    val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
-    val fakeLambda = buildFakeLambda(
-      crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Success(<invalid-xml/>.toString())
-    )
-
-    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
-    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
-
-    fakeLambda.archiveCalled should be(0)
-    fakeLambda.archiveFailedCalled should be(1)
-  }
-
-  it should "archive as failure a processed crossword with invalid" in {
+  it should "archive as failure a processed crossword with invalid xml" in {
     val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
     val fakeLambda = buildFakeLambda(
       crosswordXmlFiles = List(crosswordXmlFile),
@@ -108,54 +91,5 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
-  }
-
-  it should "archive as failure a processed crossword that fails to create a page in composer" in {
-    val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
-    val fakeLambda = buildFakeLambda(
-      crosswordXmlFiles = List(crosswordXmlFile),
-      uploader = (_, _) => Success(crosswordMicroAppResponseXml.toString()),
-      pageCreator = (_, _) => Failure(new Error("Failed to create page in composer"))
-    )
-
-    val result = Try(fakeLambda.handleRequest(null, null)).failed.get
-    result.getMessage should include("Failures detected when uploading crossword xml files (key)!")
-
-    fakeLambda.archiveCalled should be(0)
-    fakeLambda.archiveFailedCalled should be(1)
-  }
-
-  it should "not fail if the old crossword service endpoint fails" in {
-    val crosswordMicroAppResponse = Source.fromResource("example-crossword-microapp-response-quiptic-834.xml").getLines().mkString
-    val crosswordMicroAppResponseXml = XML.loadString(crosswordMicroAppResponse)
-
-    val expectedResponse = crosswordMicroAppResponseXml.toString()
-
-    val mockHttpServer = new MockWebServer()
-    mockHttpServer.start()
-
-    val baseUrl = mockHttpServer.url("/upload").toString
-    mockHttpServer.enqueue(new MockResponse().setBody(expectedResponse));
-
-    val crosswordXmlFile = CrosswordXmlFile("key", Array.empty)
-
-    val fakeLambda = new FakeLambda with HttpCrosswordClientOps {
-      override def getCrosswordXmlFiles(crosswordsBucketName: String): List[CrosswordXmlFile] = List(crosswordXmlFile)
-      override def createPage(streamName: String)(key: String, xmlData: Elem): Try[Unit] = Success(())
-
-      override def getConfig(context: Context): CrosswordXmlLambdaConfig = CrosswordXmlLambdaConfig(
-        crosswordsBucketName = "crosswords-bucket",
-        crosswordMicroAppUrl = Some("https://crossword-microapp-url"),
-        crosswordV2Url = baseUrl,
-        composerCrosswordIntegrationStreamName = "crossword-integration-stream-name",
-      )
-    }
-
-    fakeLambda.handleRequest(null, null)
-
-    fakeLambda.archiveCalled should be(1)
-    fakeLambda.archiveFailedCalled should be(0)
-
-    mockHttpServer.shutdown()
   }
 }
