@@ -9,14 +9,14 @@ The lambdas are set up in the composer AWS account. Both the CODE and PROD versi
 There is an unfinished, but possibly still useful diagram of the crossword publication system [here](https://docs.google.com/drawings/d/1q0FDZIbTDRtRMcMnciEywwgg3VnDYBDxxOATRBfWPsM/).
 
 ## crossword-xml-uploader
-This lambda fetches crossword xml files from s3 and puts them on a kinesis stream for composer to consume.
+This lambda fetches crossword xml files from s3 and uploads them to [guardian/crosswordsv2](https://github.com/guardian/crosswordv2).
 
 General process:
 
  - XML file uploaded to S3
  - Lambda runs every hour, fetches all XML files. For each XML file, it
-   - Uploads the file to the [crossword microapp](https://github.com/guardian/crossword). If an error is thrown by the microapp (which will happen if the XML is invalid for some reason), stop here. Otherwise...
-   - Send the crossword on the flex kinesis stream, where flex integration picks it up and turns it into a composer article with a scheduled launch time. The code for this is [here](https://github.com/guardian/flexible-content/blob/main/flexible-content-integration/src/main/scala/com/gu/flexiblecontent/integration/integration/CrosswordImportCommand.scala).
+   - Uploads the file to the [guardian/crosswordsv2](https://github.com/guardian/crosswordv2).
+   - If the lambda receives a 2xx response it moves the file to `s3://crossword-processed-files`, or else to `s3://crossword-failed-files` for non-success responses.
 
 
 Common problems:
