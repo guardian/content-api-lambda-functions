@@ -1,9 +1,7 @@
 package com.gu.crossword
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.crossword.pdfuploader.HttpCrosswordPdfUploader
 import com.gu.crossword.pdfuploader.models.{CrosswordPdfFile, CrosswordPdfFileName, CrosswordPdfLambdaConfig}
-import okhttp3.mockwebserver.{MockResponse, MockWebServer}
 import org.scalatest.TryValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -101,7 +99,7 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
     fakeLambda.archiveFailedCalled should be(1)
   }
 
-  it should "archive as failure a processed crossword if uploading toa public bucket fails" in {
+  it should "archive as failure a processed crossword if uploading to a public bucket fails" in {
     val fileName = "gdn.cryptic.20230418.pdf"
     val crosswordPdfFile = CrosswordPdfFileName(fileName).get
 
@@ -117,37 +115,5 @@ class LambdaTest extends AnyFlatSpec with Matchers with TryValues {
 
     fakeLambda.archiveCalled should be(0)
     fakeLambda.archiveFailedCalled should be(1)
-  }
-
-  it should "not fail if the old crossword service endpoint fails" in {
-    val expectedResponse = "<response />"
-    val mockHttpServer = new MockWebServer()
-    mockHttpServer.start()
-
-    val baseUrl = mockHttpServer.url("/pdf").toString
-    mockHttpServer.enqueue(new MockResponse().setBody(expectedResponse));
-
-    val fileName = "gdn.cryptic.20230418.pdf"
-    val crosswordPdfFile = CrosswordPdfFileName(fileName).get
-
-    val fakeLambda = new FakeLambda with HttpCrosswordPdfUploader {
-      override def getCrosswordPdfFiles(bucketName: String): List[CrosswordPdfFile] = List(CrosswordPdfFile(fileName, crosswordPdfFile, Array.empty))
-      override def uploadPdfCrosswordFile(bucketName: String, fileLocation: String, crosswordPdfFile: CrosswordPdfFile): Try[Unit] =  Success(())
-
-      override def getConfig(context: Context): CrosswordPdfLambdaConfig = CrosswordPdfLambdaConfig(
-        crosswordPdfPublicBucketName = "crossword-pdf-public-bucket-name",
-        crosswordPdfPublicFileLocation = "crossword-pdf-public-file-location",
-        crosswordMicroAppUrl = Some("https://crossword-microapp-url"),
-        crosswordV2Url = baseUrl,
-        crosswordsBucketName = "crosswords-bucket-name",
-      )
-    }
-
-    fakeLambda.handleRequest(null, null)
-
-    fakeLambda.archiveCalled should be(1)
-    fakeLambda.archiveFailedCalled should be(0)
-
-    mockHttpServer.shutdown()
   }
 }
