@@ -1,3 +1,7 @@
+**DEPRECATED: This project has been replaced by the crosswordv2 project.**
+
+_See [guardian/crosswordv2](https://github.com/guardian/crosswordv2/pull/163) for more information._
+
 # Crossword Uploader Lambdas
 Lambdas used to move crosswords from a bucket in s3 into flexible content. They are managed
 by the Editorial Tools team.
